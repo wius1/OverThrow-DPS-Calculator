@@ -245,7 +245,19 @@ const rewardsData = [
   { level: 57, rewards: { sparkles: 800 } },
   { level: 58, rewards: { orbs: 1 } },
   { level: 59, rewards: { swirls: 800 } },
-  { level: 60, rewards: { gems: 40, gift: 1 } }
+  { level: 60, rewards: { gems: 40, gift: 1 } },
+  { level: 61, rewards: { gems: 8 } },
+  { level: 62, rewards: { sparkles: 900 } },
+  { level: 63, rewards: { orbs: 1 } },
+  { level: 64, rewards: { swirls: 900 } },
+  { level: 65, rewards: { boxes: 3 } },
+  { level: 66, rewards: { gems: 8 } },
+  { level: 67, rewards: { sparkles: 900 } },
+  { level: 68, rewards: { orbs: 1 } },
+  { level: 69, rewards: { swirls: 900 } },
+  { level: 70, rewards: { gems: 50, gift: 2 } },
+  { level: 71, rewards: { gems: 8 } },
+  { level: 72, rewards: { sparkles: 1000 } }
 ];
 
 function formatRewards(rewardObj) {
@@ -304,8 +316,8 @@ function calculateRange() {
     return;
   }
 
-  if (start < 1 || end < 1 || start > 60 || end > 60) {
-    showError('Уровни должны быть от 1 до 60.');
+  if (start < 1 || end < 1 || start > 72 || end > 72) {
+    showError('Уровни должны быть от 1 до 72.');
     return;
   }
 
@@ -350,5 +362,3 @@ function calculateRange() {
 
 renderTable();
 </script>
-</body>
-</html>
