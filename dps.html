@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DPS калькулятор</title>
+
+<style>
+body {
+  margin:0;
+  font-family: Arial;
+  background:#0f172a;
+  color:white;
+  padding:20px;
+}
+
+.container {
+  max-width:600px;
+  margin:auto;
+}
+
+h1 {
+  text-align:center;
+}
+
+.weapon-switch {
+  display:flex;
+  gap:10px;
+  margin-bottom:20px;
+}
+
+.weapon {
+  flex:1;
+  padding:15px;
+  text-align:center;
+  border-radius:12px;
+  background:#374151;
+  cursor:pointer;
+}
+
+.weapon.active {
+  background:#1e3a8a;
+  border:2px solid #60a5fa;
+}
+
+input {
+  width:100%;
+  padding:12px;
+  margin:6px 0;
+  border-radius:10px;
+  border:none;
+  background:#1f2937;
+  color:white;
+}
+
+button {
+  width:100%;
+  padding:14px;
+  margin-top:10px;
+  border:none;
+  border-radius:12px;
+  background:#2563eb;
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+}
+
+.result {
+  margin-top:20px;
+  font-size:20px;
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>DPS калькулятор</h1>
+
+<div class="weapon-switch">
+  <div class="weapon active" id="sword" onclick="setWeapon('sword')">🗡️ Меч</div>
+  <div class="weapon" id="axe" onclick="setWeapon('axe')">🪓 Топор</div>
+</div>
+
+<input id="attack" placeholder="⚔️ Атака">
+<input id="attackSkill" placeholder="⚔️ Навык атаки %">
+
+<div id="crit">
+<input id="critChance" placeholder="💥 Крит шанс %">
+<input id="critSkill" placeholder="💥 Навык крит шанс %">
+<input id="critMulti" placeholder="🔥 Крит множитель">
+</div>
+
+<input id="speed" placeholder="💨 Скорость %">
+
+<button onclick="calc()">Посчитать</button>
+
+<div class="result" id="out"></div>
+
+</div>
+
+<script>
+let weapon = "sword";
+
+function setWeapon(w){
+  weapon = w;
+  sword.classList.toggle("active", w=="sword");
+  axe.classList.toggle("active", w=="axe");
+
+  crit.style.display = w=="sword" ? "block" : "none";
+}
+
+function n(v){
+  return Number(v.replace('%','').replace(',','.')) || 0;
+}
+
+function calc(){
+  let atk = n(attack.value);
+  let atkS = n(attackSkill.value);
+  let speedV = n(speed.value);
+
+  let base = atk*(1+atkS/100);
+  let interval = (weapon=="sword"?500:700)*(1-speedV/100);
+  let hits = 1000/interval;
+
+  let dmg = base;
+
+  if(weapon=="sword"){
+    let critC = n(critChance.value)+n(critSkill.value);
+    let multi = n(critMulti.value);
+    dmg = base*(1+(multi-1)*critC/100);
+  }
+
+  let dps = dmg*hits;
+
+  out.innerHTML = "DPS: "+dps.toFixed(2);
+}
+</script>
+
+</body>
+</html>
