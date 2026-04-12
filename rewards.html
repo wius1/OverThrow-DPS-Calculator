@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Награды за уровень</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0f172a;
+  color: white;
+  padding: 20px;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.topbar {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.back-btn {
+  display: inline-block;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: #2563eb;
+  color: white;
+  text-decoration: none;
+}
+
+.back-btn:hover {
+  background: #1d4ed8;
+}
+
+.range-box {
+  background: #1e293b;
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.range-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+}
+
+.field label {
+  margin-bottom: 8px;
+  color: #cbd5e1;
+  font-size: 14px;
+}
+
+.field input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: #0f172a;
+  color: white;
+}
+
+button {
+  padding: 12px 16px;
+  border: none;
+  border-radius: 10px;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+.error {
+  display: none;
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #7f1d1d;
+  color: #fecaca;
+}
+
+.summary {
+  margin-top: 14px;
+  background: #0f172a;
+  border-radius: 12px;
+  padding: 14px;
+  line-height: 1.7;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #1e293b;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+th, td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid #334155;
+}
+
+th {
+  background: #334155;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+td:first-child {
+  width: 120px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+  .range-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+  <div class="topbar">
+    <a class="back-btn" href="index.html">← На главную</a>
+  </div>
+
+  <h1>Награды за уровень</h1>
+
+  <div class="range-box">
+    <div class="range-grid">
+      <div class="field">
+        <label for="startLevel">Начальный уровень</label>
+        <input id="startLevel" type="number" min="1" max="60" placeholder="Например: 1">
+      </div>
+
+      <div class="field">
+        <label for="endLevel">Конечный уровень</label>
+        <input id="endLevel" type="number" min="1" max="60" placeholder="Например: 7">
+      </div>
+
+      <button onclick="calculateRange()">Подсчитать общие награды</button>
+    </div>
+
+    <div class="error" id="errorBox"></div>
+
+    <div class="summary" id="summaryBox">
+      Выбери диапазон уровней, чтобы увидеть суммарные награды.
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Уровень</th>
+        <th>Награды</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+</div>
+
+<script>
+const rewardsData = [
+  { level: 1, rewards: { gems: 5 } },
+  { level: 2, rewards: { sparkles: 200 } },
+  { level: 3, rewards: { gems: 5 } },
+  { level: 4, rewards: { swirls: 200 } },
+  { level: 5, rewards: { boxes: 3 } },
+  { level: 6, rewards: { gems: 5 } },
+  { level: 7, rewards: { sparkles: 300 } },
+  { level: 8, rewards: { gems: 5 } },
+  { level: 9, rewards: { swirls: 300 } },
+  { level: 10, rewards: { gems: 15, boxes: 2 } },
+  { level: 11, rewards: { gems: 5 } },
+  { level: 12, rewards: { sparkles: 400 } },
+  { level: 13, rewards: { orbs: 1 } },
+  { level: 14, rewards: { swirls: 400 } },
+  { level: 15, rewards: { boxes: 2 } },
+  { level: 16, rewards: { gems: 5 } },
+  { level: 17, rewards: { sparkles: 500 } },
+  { level: 18, rewards: { gems: 5 } },
+  { level: 19, rewards: { swirls: 500 } },
+  { level: 20, rewards: { gems: 20, boxes: 2 } },
+  { level: 21, rewards: { gems: 5 } },
+  { level: 22, rewards: { sparkles: 500 } },
+  { level: 23, rewards: { orbs: 1 } },
+  { level: 24, rewards: { swirls: 500 } },
+  { level: 25, rewards: { gems: 30, boxes: 3 } },
+  { level: 26, rewards: { gems: 5 } },
+  { level: 27, rewards: { sparkles: 500 } },
+  { level: 28, rewards: { gems: 5 } },
+  { level: 29, rewards: { swirls: 500 } },
+  { level: 30, rewards: { gems: 25, gift: 1 } },
+  { level: 31, rewards: { gems: 5 } },
+  { level: 32, rewards: { sparkles: 600 } },
+  { level: 33, rewards: { orbs: 1 } },
+  { level: 34, rewards: { swirls: 600 } },
+  { level: 35, rewards: { boxes: 2 } },
+  { level: 36, rewards: { gems: 5 } },
+  { level: 37, rewards: { sparkles: 600 } },
+  { level: 38, rewards: { orbs: 1 } },
+  { level: 39, rewards: { swirls: 600 } },
+  { level: 40, rewards: { gems: 30, gift: 1 } },
+  { level: 41, rewards: { gems: 8 } },
+  { level: 42, rewards: { sparkles: 700 } },
+  { level: 43, rewards: { orbs: 1 } },
+  { level: 44, rewards: { swirls: 700 } },
+  { level: 45, rewards: { boxes: 3 } },
+  { level: 46, rewards: { gems: 8 } },
+  { level: 47, rewards: { sparkles: 700 } },
+  { level: 48, rewards: { orbs: 1 } },
+  { level: 49, rewards: { swirls: 700 } },
+  { level: 50, rewards: { gems: 250, gift: 2, orbs: 1 } },
+  { level: 51, rewards: { gems: 8 } },
+  { level: 52, rewards: { sparkles: 800 } },
+  { level: 53, rewards: { orbs: 1 } },
+  { level: 54, rewards: { swirls: 800 } },
+  { level: 55, rewards: { boxes: 2 } },
+  { level: 56, rewards: { gems: 8 } },
+  { level: 57, rewards: { sparkles: 800 } },
+  { level: 58, rewards: { orbs: 1 } },
+  { level: 59, rewards: { swirls: 800 } },
+  { level: 60, rewards: { gems: 40, gift: 1 } }
+];
+
+function formatRewards(rewardObj) {
+  const parts = [];
+
+  if (rewardObj.gems) parts.push(`💎${rewardObj.gems}`);
+  if (rewardObj.sparkles) parts.push(`✨${rewardObj.sparkles}`);
+  if (rewardObj.swirls) parts.push(`🌀${rewardObj.swirls}`);
+  if (rewardObj.orbs) parts.push(`🔮x${rewardObj.orbs}`);
+  if (rewardObj.boxes) parts.push(`📦x${rewardObj.boxes}`);
+  if (rewardObj.gift) parts.push(`🎁x${rewardObj.gift}`);
+
+  return parts.join(' ');
+}
+
+function renderTable() {
+  const tableBody = document.getElementById('tableBody');
+  tableBody.innerHTML = '';
+
+  rewardsData.forEach(item => {
+    const tr = document.createElement('tr');
+
+    const tdLevel = document.createElement('td');
+    tdLevel.textContent = `${item.level} lvl`;
+
+    const tdRewards = document.createElement('td');
+    tdRewards.textContent = formatRewards(item.rewards);
+
+    tr.appendChild(tdLevel);
+    tr.appendChild(tdRewards);
+    tableBody.appendChild(tr);
+  });
+}
+
+function showError(message) {
+  const errorBox = document.getElementById('errorBox');
+  errorBox.style.display = 'block';
+  errorBox.textContent = message;
+}
+
+function hideError() {
+  const errorBox = document.getElementById('errorBox');
+  errorBox.style.display = 'none';
+  errorBox.textContent = '';
+}
+
+function calculateRange() {
+  hideError();
+
+  const start = Number(document.getElementById('startLevel').value);
+  const end = Number(document.getElementById('endLevel').value);
+  const summaryBox = document.getElementById('summaryBox');
+
+  if (!Number.isInteger(start) || !Number.isInteger(end)) {
+    showError('Введи начальный и конечный уровень.');
+    return;
+  }
+
+  if (start < 1 || end < 1 || start > 60 || end > 60) {
+    showError('Уровни должны быть от 1 до 60.');
+    return;
+  }
+
+  if (start > end) {
+    showError('Начальный уровень не может быть больше конечного.');
+    return;
+  }
+
+  const totals = {
+    gems: 0,
+    sparkles: 0,
+    swirls: 0,
+    orbs: 0,
+    boxes: 0,
+    gift: 0
+  };
+
+  rewardsData.forEach(item => {
+    if (item.level >= start && item.level <= end) {
+      totals.gems += item.rewards.gems || 0;
+      totals.sparkles += item.rewards.sparkles || 0;
+      totals.swirls += item.rewards.swirls || 0;
+      totals.orbs += item.rewards.orbs || 0;
+      totals.boxes += item.rewards.boxes || 0;
+      totals.gift += item.rewards.gift || 0;
+    }
+  });
+
+  const parts = [];
+  if (totals.gems) parts.push(`💎${totals.gems}`);
+  if (totals.sparkles) parts.push(`✨${totals.sparkles}`);
+  if (totals.swirls) parts.push(`🌀${totals.swirls}`);
+  if (totals.orbs) parts.push(`🔮x${totals.orbs}`);
+  if (totals.boxes) parts.push(`📦x${totals.boxes}`);
+  if (totals.gift) parts.push(`🎁x${totals.gift}`);
+
+  summaryBox.innerHTML = `
+    <strong>Суммарные награды за уровни ${start}-${end}:</strong><br>
+    ${parts.length ? parts.join(' ') : 'Нет наград'}
+  `;
+}
+
+renderTable();
+</script>
+</body>
+</html>
