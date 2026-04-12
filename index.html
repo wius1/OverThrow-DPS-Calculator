@@ -1,459 +1,246 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DPS калькулятор</title>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DPS + Награды</title>
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #111827;
-      color: #f9fafb;
-      padding: 24px;
-    }
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #111827;
+  color: white;
+}
 
-    .container {
-      max-width: 720px;
-      margin: 0 auto;
-      background: #1f2937;
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-    }
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
 
-    h1 {
-      margin-top: 0;
-      margin-bottom: 20px;
-      font-size: 28px;
-      text-align: center;
-    }
+/* tabs */
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
 
-    .weapon-switch {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
+.tab {
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: #374151;
+  cursor: pointer;
+}
 
-    .weapon-option {
-      background: #374151;
-      border: 2px solid transparent;
-      border-radius: 12px;
-      padding: 14px;
-      cursor: pointer;
-      text-align: center;
-      font-size: 18px;
-      transition: 0.2s;
-      user-select: none;
-    }
+.tab.active {
+  background: #2563eb;
+}
 
-    .weapon-option.active {
-      border-color: #60a5fa;
-      background: #1e3a8a;
-    }
+/* sections */
+.section {
+  display: none;
+}
 
-    .weapon-option input {
-      display: none;
-    }
+.section.active {
+  display: block;
+}
 
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
+/* calculator */
+input {
+  width: 100%;
+  padding: 10px;
+  margin: 6px 0;
+  border-radius: 8px;
+  border: none;
+  background: #1f2937;
+  color: white;
+}
 
-    .field {
-      display: flex;
-      flex-direction: column;
-    }
+button {
+  margin-top: 10px;
+  padding: 12px;
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+}
 
-    .field label {
-      margin-bottom: 8px;
-      font-size: 14px;
-      color: #d1d5db;
-    }
+.result {
+  margin-top: 15px;
+  font-size: 20px;
+}
 
-    .field input {
-      padding: 12px 14px;
-      border-radius: 10px;
-      border: 1px solid #4b5563;
-      background: #111827;
-      color: #fff;
-      font-size: 16px;
-      outline: none;
-    }
-
-    .field input:focus {
-      border-color: #60a5fa;
-    }
-
-    .full {
-      grid-column: 1 / -1;
-    }
-
-    .actions {
-      margin-top: 22px;
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    button {
-      border: none;
-      border-radius: 10px;
-      padding: 12px 18px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .calc-btn {
-      background: #2563eb;
-      color: white;
-    }
-
-    .calc-btn:hover {
-      background: #1d4ed8;
-    }
-
-    .clear-btn {
-      background: #4b5563;
-      color: white;
-    }
-
-    .clear-btn:hover {
-      background: #374151;
-    }
-
-    .result {
-      margin-top: 24px;
-      background: #111827;
-      border: 1px solid #374151;
-      border-radius: 14px;
-      padding: 18px;
-    }
-
-    .result h2 {
-      margin-top: 0;
-      margin-bottom: 12px;
-      font-size: 22px;
-    }
-
-    .result-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 8px 0;
-      border-bottom: 1px solid #1f2937;
-    }
-
-    .result-row:last-child {
-      border-bottom: none;
-    }
-
-    .result-label {
-      color: #cbd5e1;
-    }
-
-    .result-value {
-      font-weight: bold;
-      text-align: right;
-    }
-
-    .muted {
-      color: #9ca3af;
-      font-size: 13px;
-      margin-top: 10px;
-      line-height: 1.5;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .error {
-      margin-top: 16px;
-      padding: 12px 14px;
-      border-radius: 10px;
-      background: #7f1d1d;
-      color: #fecaca;
-      display: none;
-    }
-
-    @media (max-width: 640px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
-
-      .result-row {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .result-value {
-        text-align: left;
-      }
-    }
-  </style>
+/* rewards */
+.level {
+  background: #1f2937;
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+</style>
 </head>
+
 <body>
-  <div class="container">
-    <h1>DPS калькулятор</h1>
+<div class="container">
 
-    <div class="weapon-switch">
-      <label class="weapon-option active" id="weaponSwordLabel">
-        <input type="radio" name="weapon" value="sword" checked>
-        🗡️ Меч
-      </label>
-      <label class="weapon-option" id="weaponAxeLabel">
-        <input type="radio" name="weapon" value="axe">
-        🪓 Топор
-      </label>
-    </div>
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="openTab('dps')">⚔️ DPS</div>
+  <div class="tab" onclick="openTab('rewards')">🎁 Награды</div>
+</div>
 
-    <div class="grid">
-      <div class="field">
-        <label for="attack">⚔️ Атака</label>
-        <input id="attack" type="text" placeholder="Например: 2985">
-      </div>
+<!-- DPS -->
+<div id="dps" class="section active">
 
-      <div class="field">
-        <label for="attackSkill">⚔️ Навык атаки %</label>
-        <input id="attackSkill" type="text" placeholder="Например: 17%">
-      </div>
+<select id="weapon">
+  <option value="sword">🗡️ Меч</option>
+  <option value="axe">🪓 Топор</option>
+</select>
 
-      <div class="field crit-field">
-        <label for="critChance">💥 Крит шанс %</label>
-        <input id="critChance" type="text" placeholder="Например: 20%">
-      </div>
+<input id="attack" placeholder="⚔️ Атака">
+<input id="attackSkill" placeholder="⚔️ Навык атаки %">
 
-      <div class="field crit-field">
-        <label for="critSkillChance">💥 Навык крит шанс %</label>
-        <input id="critSkillChance" type="text" placeholder="Например: 8%">
-      </div>
+<div id="critBlock">
+<input id="critChance" placeholder="💥 Крит шанс %">
+<input id="critSkill" placeholder="💥 Навык крит шанс %">
+<input id="critMulti" placeholder="🔥 Крит множитель">
+</div>
 
-      <div class="field crit-field">
-        <label for="critMultiplier">✨🔥 Крит множитель</label>
-        <input id="critMultiplier" type="text" placeholder="Например: 1.95">
-      </div>
+<input id="speed" placeholder="💨 Скорость %">
 
-      <div class="field">
-        <label for="speed">💨 Скорость -X%</label>
-        <input id="speed" type="text" placeholder="Например: 10%">
-      </div>
-    </div>
+<button onclick="calc()">Посчитать DPS</button>
 
-    <div class="actions">
-      <button class="calc-btn" onclick="calculateDPS()">Посчитать DPS</button>
-      <button class="clear-btn" onclick="clearForm()">Очистить</button>
-    </div>
+<div class="result" id="out"></div>
 
-    <div class="error" id="errorBox"></div>
+</div>
 
-    <div class="result" id="resultBox">
-      <h2>Результат</h2>
+<!-- REWARDS -->
+<div id="rewards" class="section">
 
-      <div class="result-row">
-        <div class="result-label">Оружие</div>
-        <div class="result-value" id="outWeapon">-</div>
-      </div>
+<div id="rewardList"></div>
 
-      <div class="result-row">
-        <div class="result-label">Базовый урон за удар</div>
-        <div class="result-value" id="outBaseDamage">-</div>
-      </div>
+</div>
 
-      <div class="result-row sword-only-result">
-        <div class="result-label">Итоговый крит шанс</div>
-        <div class="result-value" id="outTotalCrit">-</div>
-      </div>
+</div>
 
-      <div class="result-row">
-        <div class="result-label">Средний урон за удар</div>
-        <div class="result-value" id="outAvgDamage">-</div>
-      </div>
+<script>
+/* tabs */
+function openTab(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
 
-      <div class="result-row">
-        <div class="result-label">Интервал атаки</div>
-        <div class="result-value" id="outInterval">-</div>
-      </div>
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
 
-      <div class="result-row">
-        <div class="result-label">Атак в секунду</div>
-        <div class="result-value" id="outHitsPerSecond">-</div>
-      </div>
+/* parse */
+function n(v){
+  return Number(v.replace('%','').replace(',','.')) || 0;
+}
 
-      <div class="result-row">
-        <div class="result-label">DPS</div>
-        <div class="result-value" id="outDps">-</div>
-      </div>
+/* calc */
+function calc(){
+  let weapon = document.getElementById('weapon').value;
+  let atk = n(attack.value);
+  let atkS = n(attackSkill.value);
+  let speed = n(speed.value);
 
-      <div class="muted">
-        Формулы:<br>
-        Базовый урон = Атака × (1 + Навык атаки / 100)<br>
-        Для меча: итоговый крит = крит шанс + навык крит шанса<br>
-        Интервал = базовый интервал × (1 - скорость / 100)<br>
-        DPS = средний урон × атак в секунду
-      </div>
-    </div>
-  </div>
+  let base = atk * (1 + atkS/100);
 
-  <script>
-    const weaponInputs = document.querySelectorAll('input[name="weapon"]');
-    const weaponSwordLabel = document.getElementById('weaponSwordLabel');
-    const weaponAxeLabel = document.getElementById('weaponAxeLabel');
-    const critFields = document.querySelectorAll('.crit-field');
-    const swordOnlyResults = document.querySelectorAll('.sword-only-result');
-    const errorBox = document.getElementById('errorBox');
+  let interval = (weapon=='sword'?500:700)*(1-speed/100);
+  let hits = 1000/interval;
 
-    weaponInputs.forEach(input => {
-      input.addEventListener('change', updateWeaponUI);
-    });
+  let dmg = base;
 
-    function updateWeaponUI() {
-      const weapon = getSelectedWeapon();
+  if(weapon=='sword'){
+    let crit = n(critChance.value)+n(critSkill.value);
+    let multi = n(critMulti.value);
+    dmg = base*(1+(multi-1)*crit/100);
+  }
 
-      weaponSwordLabel.classList.toggle('active', weapon === 'sword');
-      weaponAxeLabel.classList.toggle('active', weapon === 'axe');
+  let dps = dmg*hits;
 
-      critFields.forEach(el => {
-        el.classList.toggle('hidden', weapon !== 'sword');
-      });
+  out.innerHTML = "DPS: "+dps.toFixed(2);
+}
 
-      swordOnlyResults.forEach(el => {
-        el.classList.toggle('hidden', weapon !== 'sword');
-      });
-    }
+/* rewards data */
+const rewards = [
+"60 💎40 🎁x1",
+"59 🌀800",
+"58 🔮x1",
+"57 ✨800",
+"56 💎8",
+"55 📦x2",
+"54 🌀800",
+"53 🔮x1",
+"52 ✨800",
+"51 💎8",
+"50 💎250 🎁x2 🔮x1",
+"49 🌀700",
+"48 🔮x1",
+"47 ✨700",
+"46 💎8",
+"45 📦x3",
+"44 🌀700",
+"43 🔮x1",
+"42 ✨700",
+"41 💎8",
+"40 💎30 🎁x1",
+"39 🌀600",
+"38 🔮x1",
+"37 ✨600",
+"36 💎5",
+"35 📦x2",
+"34 🌀600",
+"33 🔮x1",
+"32 ✨600",
+"31 💎5",
+"30 💎25 🎁x1",
+"29 🌀500",
+"28 💎5",
+"27 ✨500",
+"26 💎5",
+"25 💎30 📦x3",
+"24 🌀500",
+"23 🔮x1",
+"22 ✨500",
+"21 💎5",
+"20 💎20 📦x2",
+"19 🌀500",
+"18 💎5",
+"17 ✨500",
+"16 💎5",
+"15 📦x2",
+"14 🌀400",
+"13 🔮x1",
+"12 ✨400",
+"11 💎5",
+"10 💎15 📦x2",
+"9 🌀300",
+"8 💎5",
+"7 ✨300",
+"6 💎5",
+"5 📦x3",
+"4 🌀200",
+"3 💎5",
+"2 ✨200",
+"1 💎5"
+];
 
-    function getSelectedWeapon() {
-      return document.querySelector('input[name="weapon"]:checked').value;
-    }
+/* render rewards */
+const list = document.getElementById("rewardList");
+rewards.forEach(r=>{
+  let div = document.createElement("div");
+  div.className="level";
+  div.innerText=r;
+  list.appendChild(div);
+});
+</script>
 
-    function parseNumber(value) {
-      if (typeof value !== 'string') return 0;
-      const cleaned = value
-        .replace('%', '')
-        .replace(',', '.')
-        .trim();
-
-      if (cleaned === '') return 0;
-
-      const num = Number(cleaned);
-      return Number.isFinite(num) ? num : NaN;
-    }
-
-    function round2(num) {
-      return Number(num).toFixed(2);
-    }
-
-    function showError(message) {
-      errorBox.style.display = 'block';
-      errorBox.textContent = message;
-    }
-
-    function hideError() {
-      errorBox.style.display = 'none';
-      errorBox.textContent = '';
-    }
-
-    function calculateDPS() {
-      hideError();
-
-      const weapon = getSelectedWeapon();
-      const attack = parseNumber(document.getElementById('attack').value);
-      const attackSkill = parseNumber(document.getElementById('attackSkill').value);
-      const speed = parseNumber(document.getElementById('speed').value);
-
-      if (!Number.isFinite(attack) || attack < 0) {
-        showError('Введите корректное значение для поля "Атака".');
-        return;
-      }
-
-      if (!Number.isFinite(attackSkill)) {
-        showError('Введите корректное значение для поля "Навык атаки %".');
-        return;
-      }
-
-      if (!Number.isFinite(speed) || speed < 0 || speed >= 100) {
-        showError('Скорость должна быть числом от 0 до 99.99%.');
-        return;
-      }
-
-      const baseInterval = weapon === 'sword' ? 500 : 700;
-      const baseDamage = attack * (1 + attackSkill / 100);
-      const attackInterval = baseInterval * (1 - speed / 100);
-      const hitsPerSecond = 1000 / attackInterval;
-
-      let totalCritChance = 0;
-      let avgDamage = baseDamage;
-
-      if (weapon === 'sword') {
-        const critChance = parseNumber(document.getElementById('critChance').value);
-        const critSkillChance = parseNumber(document.getElementById('critSkillChance').value);
-        const critMultiplier = parseNumber(document.getElementById('critMultiplier').value);
-
-        if (!Number.isFinite(critChance) || critChance < 0) {
-          showError('Введите корректное значение для поля "Крит шанс %".');
-          return;
-        }
-
-        if (!Number.isFinite(critSkillChance) || critSkillChance < 0) {
-          showError('Введите корректное значение для поля "Навык крит шанс %".');
-          return;
-        }
-
-        if (!Number.isFinite(critMultiplier) || critMultiplier < 0) {
-          showError('Введите корректное значение для поля "Крит множитель".');
-          return;
-        }
-
-        totalCritChance = critChance + critSkillChance;
-        avgDamage = baseDamage * (1 + (critMultiplier - 1) * totalCritChance / 100);
-      }
-
-      const dps = avgDamage * hitsPerSecond;
-
-      document.getElementById('outWeapon').textContent = weapon === 'sword' ? '🗡️ Меч' : '🪓 Топор';
-      document.getElementById('outBaseDamage').textContent = round2(baseDamage);
-      document.getElementById('outAvgDamage').textContent = round2(avgDamage);
-      document.getElementById('outInterval').textContent = round2(attackInterval) + ' мс';
-      document.getElementById('outHitsPerSecond').textContent = round2(hitsPerSecond);
-      document.getElementById('outDps').textContent = round2(dps);
-
-      if (weapon === 'sword') {
-        document.getElementById('outTotalCrit').textContent = round2(totalCritChance) + '%';
-      } else {
-        document.getElementById('outTotalCrit').textContent = '-';
-      }
-
-      updateWeaponUI();
-    }
-
-    function clearForm() {
-      document.getElementById('attack').value = '';
-      document.getElementById('attackSkill').value = '';
-      document.getElementById('critChance').value = '';
-      document.getElementById('critSkillChance').value = '';
-      document.getElementById('critMultiplier').value = '';
-      document.getElementById('speed').value = '';
-
-      document.getElementById('outWeapon').textContent = '-';
-      document.getElementById('outBaseDamage').textContent = '-';
-      document.getElementById('outTotalCrit').textContent = '-';
-      document.getElementById('outAvgDamage').textContent = '-';
-      document.getElementById('outInterval').textContent = '-';
-      document.getElementById('outHitsPerSecond').textContent = '-';
-      document.getElementById('outDps').textContent = '-';
-
-      hideError();
-    }
-
-    updateWeaponUI();
-  </script>
 </body>
 </html>
