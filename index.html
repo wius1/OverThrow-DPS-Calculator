@@ -29,29 +29,12 @@
           </div>
         </div>
 
-        <!-- АНИМАЦИЯ -->
-        <div id="battle-scene">
-          <span id="weapon">🗡️</span>
-          <span id="runner">🏃</span>
-          <div id="ground">
-            ・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・・
-          </div>
-        </div>
+
 
       </div>
     </div>
   </div>
 
-  <script>
-    const weaponEl = document.getElementById("weapon");
 
-    const weapons = ["🗡️", "🪓"];
-    let current = 0;
-
-    setInterval(() => {
-      current = (current + 1) % weapons.length;
-      weaponEl.textContent = weapons[current];
-    }, 4000);
-  </script>
 </body>
 </html>
