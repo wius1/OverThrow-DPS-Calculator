@@ -489,3 +489,30 @@ td:first-child {
   }
 }
 
+/* ===== АТАКА ЛЕЙАУТ ===== */
+
+.attack-layout {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 14px;
+  align-items: center;
+}
+
+.attack-stats {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* мобильная адаптация */
+@media (max-width: 760px) {
+  .attack-layout {
+    grid-template-columns: 70px 1fr;
+    gap: 10px;
+  }
+
+  .char-equip-slot {
+    width: 64px;
+    height: 64px;
+  }
+}
