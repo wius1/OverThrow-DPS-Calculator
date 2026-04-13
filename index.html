@@ -1,56 +1,33 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OverThrow Tools</title>
-
-<style>
-body {
-  margin:0;
-  font-family: Arial;
-  background:#0f172a;
-  color:white;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-}
-
-.container {
-  text-align:center;
-}
-
-h1 {
-  margin-bottom:30px;
-}
-
-.btn {
-  display:block;
-  width:250px;
-  margin:10px auto;
-  padding:15px;
-  border-radius:12px;
-  background:#2563eb;
-  text-decoration:none;
-  color:white;
-  font-size:18px;
-}
-
-.btn:hover {
-  background:#1d4ed8;
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OverThrow Tools</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
+  <div class="container">
+    <div class="app-shell">
+      <div class="app-header">
+        <h3>⚙️ OverThrow Tools</h3>
+      </div>
 
-<div class="container">
-  <h1>OverThrow Tools</h1>
+      <div class="app-body">
+        <div class="settings-card" style="text-align:center;">
+          <div class="settings-section-title">ИНСТРУМЕНТЫ</div>
+          <div class="thumb" style="margin: 0 auto 12px;">🛠️</div>
+          <div class="muted" style="margin-bottom: 14px;">
+            Выбери нужный инструмент
+          </div>
 
-  <a class="btn" href="dps.html">⚔️ DPS калькулятор</a>
-  <a class="btn" href="rewards.html">🎁 Награды</a>
-</div>
-
+          <div class="menu">
+            <a class="btn btn-primary" href="dps.html">⚔️ DPS калькулятор</a>
+            <a class="btn" href="rewards.html">🎁 Награды за уровень</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
