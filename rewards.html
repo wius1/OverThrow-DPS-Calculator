@@ -1,61 +1,64 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Награды за уровень</title>
-
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Награды за уровень</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-<div class="container">
-
-  <div class="topbar">
-    <a class="btn" href="index.html">← На главную</a>
-  </div>
-
-  <h1>Награды за уровень</h1>
-
-  <div class="range-box">
-    <div class="range-grid">
-
-      <div class="field">
-        <label for="startLevel">Начальный уровень</label>
-        <input id="startLevel" type="number" min="1" max="72" placeholder="Например: 1">
-      </div>
-
-      <div class="field">
-        <label for="endLevel">Конечный уровень</label>
-        <input id="endLevel" type="number" min="1" max="72" placeholder="Например: 7">
-      </div>
-
-      <button class="btn" onclick="calculateRange()">
-        Подсчитать награды
-      </button>
-
+  <div class="container">
+    <div class="topbar">
+      <a class="btn" href="index.html">← На главную</a>
     </div>
 
-    <div class="error" id="errorBox"></div>
+    <div class="app-shell">
+      <div class="app-header">
+        <h3>🎁 Награды за уровень</h3>
+      </div>
 
-    <div class="summary" id="summaryBox">
-      Выбери диапазон уровней
+      <div class="app-body">
+        <div class="settings-card">
+          <div class="settings-section-title">Подсчёт наград</div>
+
+          <div class="range-grid">
+            <div class="field">
+              <label for="startLevel">Начальный уровень</label>
+              <input id="startLevel" type="number" min="1" max="72" placeholder="Например: 1">
+            </div>
+
+            <div class="field">
+              <label for="endLevel">Конечный уровень</label>
+              <input id="endLevel" type="number" min="1" max="72" placeholder="Например: 7">
+            </div>
+
+            <button class="btn btn-primary" onclick="calculateRange()">Подсчитать</button>
+          </div>
+
+          <div class="error" id="errorBox"></div>
+
+          <div class="summary" id="summaryBox">
+            Выбери диапазон уровней, чтобы увидеть суммарные награды.
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-section-title">Таблица наград</div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Уровень</th>
+                <th>Награды</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Уровень</th>
-        <th>Награды</th>
-      </tr>
-    </thead>
-
-    <tbody id="tableBody"></tbody>
-  </table>
-
-</div>
-
-<script src="rewards.js"></script>
+  <script src="rewards.js"></script>
 </body>
 </html>
