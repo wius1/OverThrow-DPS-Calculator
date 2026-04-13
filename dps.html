@@ -5,139 +5,269 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DPS калькулятор</title>
 
+<link rel="stylesheet" href="style.css">
+
 <style>
-body {
-  margin:0;
-  font-family: Arial;
-  background:#0f172a;
-  color:white;
-  padding:20px;
+.dps-wrap {
+  max-width: 700px;
+  margin: 0 auto;
 }
 
-.container {
-  max-width:600px;
-  margin:auto;
+.preview-card {
+  display: none;
+  background: #1a1a2e;
+  border-radius: 14px;
+  padding: 10px 12px;
+  margin-bottom: 18px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
-h1 {
-  text-align:center;
+.preview-card.visible {
+  display: block;
 }
 
-.weapon-switch {
-  display:flex;
-  gap:10px;
-  margin-bottom:20px;
+.preview-title {
+  font-size: 12px;
+  color: #f44336;
+  font-weight: 700;
+  margin-bottom: 8px;
+  text-align: center;
 }
 
-.weapon {
-  flex:1;
-  padding:15px;
-  text-align:center;
-  border-radius:12px;
-  background:#374151;
-  cursor:pointer;
+.preview-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
-.weapon.active {
-  background:#1e3a8a;
-  border:2px solid #60a5fa;
+.preview-row:last-child {
+  border-bottom: none;
 }
 
-input {
-  width:100%;
-  padding:12px;
-  margin:6px 0;
-  border-radius:10px;
-  border:none;
-  background:#1f2937;
-  color:white;
+.preview-label {
+  font-size: 12px;
+  color: #999;
 }
 
-button {
-  width:100%;
-  padding:14px;
-  margin-top:10px;
-  border:none;
-  border-radius:12px;
-  background:#2563eb;
-  color:white;
-  font-size:16px;
-  cursor:pointer;
+.preview-value {
+  font-size: 13px;
+  color: #fff;
+  font-weight: 600;
+  text-align: right;
 }
 
-.result {
-  margin-top:20px;
-  font-size:20px;
-  text-align:center;
+.preview-extra {
+  color: #4caf50;
+  font-size: 11px;
+}
+
+.preview-crit-row.hidden {
+  display: none;
+}
+
+.dps-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.dps-actions button {
+  margin-top: 0;
+}
+
+@media (max-width: 700px) {
+  .dps-actions {
+    flex-direction: column;
+  }
 }
 </style>
 </head>
 
 <body>
+<div class="container dps-wrap">
 
-<div class="container">
+  <div class="topbar">
+    <a class="btn" href="index.html">← На главную</a>
+  </div>
 
-<h1>DPS калькулятор</h1>
+  <h1>DPS калькулятор</h1>
 
-<div class="weapon-switch">
-  <div class="weapon active" id="sword" onclick="setWeapon('sword')">🗡️ Меч</div>
-  <div class="weapon" id="axe" onclick="setWeapon('axe')">🪓 Топор</div>
-</div>
+  <div class="preview-card" id="previewCard">
+    <div class="preview-title">⚔️ Атака</div>
 
-<input id="attack" placeholder="⚔️ Атака">
-<input id="attackSkill" placeholder="⚔️ Навык атаки %">
+    <div class="preview-row">
+      <span class="preview-label">⚔️ Урон</span>
+      <span class="preview-value" id="previewDamage">0 <span class="preview-extra" id="previewDamageExtra">(0 +0%)</span></span>
+    </div>
 
-<div id="crit">
-<input id="critChance" placeholder="💥 Крит шанс %">
-<input id="critSkill" placeholder="💥 Навык крит шанс %">
-<input id="critMulti" placeholder="🔥 Крит множитель">
-</div>
+    <div class="preview-row preview-crit-row" id="previewCritRow">
+      <span class="preview-label">🎯 Крит</span>
+      <span class="preview-value" id="previewCrit">0.00% <span class="preview-extra" id="previewCritExtra">+0.00%</span></span>
+    </div>
 
-<input id="speed" placeholder="💨 Скорость %">
+    <div class="preview-row">
+      <span class="preview-label">💨 Скорость</span>
+      <span class="preview-value" id="previewSpeed">-0% <span class="preview-extra">КД</span></span>
+    </div>
 
-<button onclick="calc()">Посчитать</button>
+    <div class="preview-row">
+      <span class="preview-label">⚡ DPS</span>
+      <span class="preview-value" id="previewDps">0.00 <span class="preview-extra">DPS</span></span>
+    </div>
+  </div>
 
-<div class="result" id="out"></div>
+  <div class="weapon-switch">
+    <div class="weapon active" id="sword" onclick="setWeapon('sword')">🗡️ Меч</div>
+    <div class="weapon" id="axe" onclick="setWeapon('axe')">🪓 Топор</div>
+  </div>
+
+  <input id="attack" placeholder="⚔️ Атака">
+  <input id="attackSkill" placeholder="⚔️ Навык атаки %">
+
+  <div id="crit">
+    <input id="critChance" placeholder="💥 Крит шанс %">
+    <input id="critSkill" placeholder="💥 Навык крит шанс %">
+    <input id="critMulti" placeholder="🔥 Крит множитель">
+  </div>
+
+  <input id="speed" placeholder="💨 Скорость %">
+
+
+
+  <div class="result" id="out">DPS: 0.00</div>
 
 </div>
 
 <script>
 let weapon = "sword";
 
-function setWeapon(w){
+const attackInput = document.getElementById("attack");
+const attackSkillInput = document.getElementById("attackSkill");
+const critChanceInput = document.getElementById("critChance");
+const critSkillInput = document.getElementById("critSkill");
+const critMultiInput = document.getElementById("critMulti");
+const speedInput = document.getElementById("speed");
+
+const previewCard = document.getElementById("previewCard");
+const previewCritRow = document.getElementById("previewCritRow");
+
+function n(v) {
+  if (!v) return 0;
+  return Number(String(v).replace("%", "").replace(",", ".").trim()) || 0;
+}
+
+function round2(x) {
+  return Number(x).toFixed(2);
+}
+
+function hasAnyValue() {
+  return [
+    attackInput.value,
+    attackSkillInput.value,
+    critChanceInput.value,
+    critSkillInput.value,
+    critMultiInput.value,
+    speedInput.value
+  ].some(v => String(v).trim() !== "");
+}
+
+function setWeapon(w) {
   weapon = w;
-  sword.classList.toggle("active", w=="sword");
-  axe.classList.toggle("active", w=="axe");
+  sword.classList.toggle("active", w === "sword");
+  axe.classList.toggle("active", w === "axe");
 
-  crit.style.display = w=="sword" ? "block" : "none";
+  crit.style.display = w === "sword" ? "block" : "none";
+  previewCritRow.classList.toggle("hidden", w !== "sword");
+
+  updatePreview();
 }
 
-function n(v){
-  return Number(v.replace('%','').replace(',','.')) || 0;
-}
+function calculateValues() {
+  const atk = n(attackInput.value);
+  const atkS = n(attackSkillInput.value);
+  const speedV = n(speedInput.value);
 
-function calc(){
-  let atk = n(attack.value);
-  let atkS = n(attackSkill.value);
-  let speedV = n(speed.value);
+  const baseDamage = atk;
+  const totalDamage = baseDamage * (1 + atkS / 100);
 
-  let base = atk*(1+atkS/100);
-  let interval = (weapon=="sword"?500:700)*(1-speedV/100);
-  let hits = 1000/interval;
+  const baseInterval = weapon === "sword" ? 500 : 700;
+  const interval = baseInterval * (1 - speedV / 100);
+  const hitsPerSecond = interval > 0 ? (1000 / interval) : 0;
 
-  let dmg = base;
+  let totalCrit = 0;
+  let critSkill = 0;
+  let critMultiplier = 0;
+  let avgDamage = totalDamage;
 
-  if(weapon=="sword"){
-    let critC = n(critChance.value)+n(critSkill.value);
-    let multi = n(critMulti.value);
-    dmg = base*(1+(multi-1)*critC/100);
+  if (weapon === "sword") {
+    const baseCrit = n(critChanceInput.value);
+    critSkill = n(critSkillInput.value);
+    critMultiplier = n(critMultiInput.value);
+    totalCrit = baseCrit + critSkill;
+
+    if (critMultiplier > 0) {
+      avgDamage = totalDamage * (1 + (critMultiplier - 1) * totalCrit / 100);
+    }
   }
 
-  let dps = dmg*hits;
+  const dps = avgDamage * hitsPerSecond;
 
-  out.innerHTML = "DPS: "+dps.toFixed(2);
+  return {
+    baseDamage,
+    totalDamage,
+    atkS,
+    totalCrit,
+    critSkill,
+    speedV,
+    dps
+  };
 }
-</script>
 
+function updatePreview() {
+  const visible = hasAnyValue();
+  previewCard.classList.toggle("visible", visible);
+
+  if (!visible) {
+    out.innerHTML = "DPS: 0.00";
+    return;
+  }
+
+  const data = calculateValues();
+
+  document.getElementById("previewDamage").innerHTML =
+    `${round2(data.totalDamage)} <span class="preview-extra" id="previewDamageExtra">(${round2(data.baseDamage)} +${round2(data.atkS)}%)</span>`;
+
+  if (weapon === "sword") {
+    document.getElementById("previewCrit").innerHTML =
+      `${round2(data.totalCrit)}% <span class="preview-extra" id="previewCritExtra">+${round2(data.critSkill)}%</span>`;
+  }
+
+  document.getElementById("previewSpeed").innerHTML =
+    `-${round2(data.speedV)}% <span class="preview-extra">КД</span>`;
+
+  document.getElementById("previewDps").innerHTML =
+    `${round2(data.dps)} <span class="preview-extra">DPS</span>`;
+
+  out.innerHTML = `DPS: ${round2(data.dps)}`;
+}
+
+
+
+[
+  attackInput,
+  attackSkillInput,
+  critChanceInput,
+  critSkillInput,
+  critMultiInput,
+  speedInput
+].forEach(input => {
+  input.addEventListener("input", updatePreview);
+});
+
+setWeapon("sword");
+updatePreview();
+</script>
 </body>
 </html>
