@@ -5,6 +5,71 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DPS калькулятор</title>
   <link rel="stylesheet" href="style.css">
+
+  <style>
+    .preview-layout {
+      display: grid;
+      grid-template-columns: 96px 1fr;
+      gap: 14px;
+      align-items: stretch;
+      margin-bottom: 16px;
+    }
+
+    .equip-card {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      min-height: 162px;
+      padding: 12px;
+    }
+
+    .equip-card.visible {
+      display: flex;
+    }
+
+    .char-equip-slot {
+      width: 72px;
+      height: 72px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: default;
+      border: 2px dashed rgba(255,255,255,0.12);
+      background: #181818;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    .char-equip-slot.filled {
+      border-style: solid;
+    }
+
+    .rarity-legendary {
+      border-color: #f9a825 !important;
+      background: #2a1a00 !important;
+      animation: legendaryBorder 2s linear infinite;
+      box-shadow:
+        0 0 0 1px rgba(249, 168, 37, 0.18),
+        0 0 18px rgba(249, 168, 37, 0.18),
+        inset 0 0 18px rgba(249, 168, 37, 0.08);
+    }
+
+    @keyframes legendaryBorder {
+      0% { box-shadow: 0 0 0 1px rgba(249,168,37,0.20), 0 0 10px rgba(249,168,37,0.12), inset 0 0 10px rgba(249,168,37,0.05); }
+      50% { box-shadow: 0 0 0 1px rgba(249,168,37,0.32), 0 0 22px rgba(249,168,37,0.26), inset 0 0 14px rgba(249,168,37,0.10); }
+      100% { box-shadow: 0 0 0 1px rgba(249,168,37,0.20), 0 0 10px rgba(249,168,37,0.12), inset 0 0 10px rgba(249,168,37,0.05); }
+    }
+
+    @media (max-width: 760px) {
+      .preview-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .equip-card {
+        min-height: auto;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -18,35 +83,43 @@
       </div>
 
       <div class="app-body">
-        <div class="settings-card preview-card" id="previewCard">
-          <div class="preview-title">⚔ Атака</div>
-
-          <div class="preview-row">
-            <span class="preview-label">⚔️ Урон</span>
-            <span class="preview-value" id="previewDamage">
-              0 <span class="preview-extra">(0 +0%)</span>
-            </span>
+        <div class="preview-layout">
+          <div class="settings-card equip-card" id="equipCard">
+            <div class="char-equip-slot filled rarity-legendary" id="equipSlot">
+              <span id="equipIcon" style="font-size:28px">🗡️</span>
+            </div>
           </div>
 
-          <div class="preview-row" id="previewCritRow">
-            <span class="preview-label">🎯 Крит</span>
-            <span class="preview-value" id="previewCrit">
-              0.00% <span class="preview-extra">+0.00%</span>
-            </span>
-          </div>
+          <div class="settings-card preview-card" id="previewCard">
+            <div class="preview-title">⚔ Атака</div>
 
-          <div class="preview-row">
-            <span class="preview-label">💨 Скорость</span>
-            <span class="preview-value" id="previewSpeed">
-              -0.00% <span class="preview-extra">КД</span>
-            </span>
-          </div>
+            <div class="preview-row">
+              <span class="preview-label">⚔️ Урон</span>
+              <span class="preview-value" id="previewDamage">
+                0 <span class="preview-extra">(0 +0%)</span>
+              </span>
+            </div>
 
-          <div class="preview-row">
-            <span class="preview-label">⚡ DPS</span>
-            <span class="preview-value" id="previewDps">
-              0.00 <span class="preview-extra">DPS</span>
-            </span>
+            <div class="preview-row" id="previewCritRow">
+              <span class="preview-label">🎯 Крит</span>
+              <span class="preview-value" id="previewCrit">
+                0.00% <span class="preview-extra">+0.00%</span>
+              </span>
+            </div>
+
+            <div class="preview-row">
+              <span class="preview-label">💨 Скорость</span>
+              <span class="preview-value" id="previewSpeed">
+                -0.00% <span class="preview-extra">КД</span>
+              </span>
+            </div>
+
+            <div class="preview-row">
+              <span class="preview-label">⚡ DPS</span>
+              <span class="preview-value" id="previewDps">
+                0.00 <span class="preview-extra">DPS</span>
+              </span>
+            </div>
           </div>
         </div>
 
@@ -97,16 +170,12 @@
             </div>
           </div>
         </div>
-
-        <div class="settings-card">
-          <div class="settings-section-title">Итог</div>
-          <div class="result" id="out">DPS: 0.00</div>
-        </div>
       </div>
     </div>
   </div>
 
   <script>
+    const STORAGE_KEY = "overthrow_dps_setup_v1";
     let weapon = "sword";
 
     const attackInput = document.getElementById("attack");
@@ -119,7 +188,8 @@
     const previewCard = document.getElementById("previewCard");
     const previewCritRow = document.getElementById("previewCritRow");
     const critCard = document.getElementById("critCard");
-    const out = document.getElementById("out");
+    const equipCard = document.getElementById("equipCard");
+    const equipIcon = document.getElementById("equipIcon");
 
     function n(v) {
       if (!v) return 0;
@@ -141,7 +211,47 @@
       ].some(v => String(v).trim() !== "");
     }
 
-    function setWeapon(w) {
+    function saveSetup() {
+      const data = {
+        weapon,
+        attack: attackInput.value,
+        attackSkill: attackSkillInput.value,
+        critChance: critChanceInput.value,
+        critSkill: critSkillInput.value,
+        critMulti: critMultiInput.value,
+        speed: speedInput.value
+      };
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function loadSetup() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+
+      try {
+        const data = JSON.parse(raw);
+
+        if (data.weapon === "axe" || data.weapon === "sword") {
+          weapon = data.weapon;
+        }
+
+        attackInput.value = data.attack || "";
+        attackSkillInput.value = data.attackSkill || "";
+        critChanceInput.value = data.critChance || "";
+        critSkillInput.value = data.critSkill || "";
+        critMultiInput.value = data.critMulti || "";
+        speedInput.value = data.speed || "";
+      } catch (e) {
+        console.error("Не удалось загрузить сохранённый сетап", e);
+      }
+    }
+
+    function updateEquipIcon() {
+      equipIcon.textContent = weapon === "sword" ? "🗡️" : "🪓";
+    }
+
+    function setWeapon(w, shouldSave = true) {
       weapon = w;
 
       document.getElementById("sword").classList.toggle("active", w === "sword");
@@ -150,7 +260,12 @@
       critCard.classList.toggle("hidden", w !== "sword");
       previewCritRow.classList.toggle("hidden", w !== "sword");
 
+      updateEquipIcon();
       updatePreview();
+
+      if (shouldSave) {
+        saveSetup();
+      }
     }
 
     function calculateValues() {
@@ -197,9 +312,9 @@
     function updatePreview() {
       const visible = hasAnyValue();
       previewCard.classList.toggle("visible", visible);
+      equipCard.classList.toggle("visible", visible);
 
       if (!visible) {
-        out.textContent = "DPS: 0.00";
         return;
       }
 
@@ -218,8 +333,6 @@
 
       document.getElementById("previewDps").innerHTML =
         `${round2(data.dps)} <span class="preview-extra">DPS</span>`;
-
-      out.textContent = `DPS: ${round2(data.dps)}`;
     }
 
     [
@@ -230,10 +343,14 @@
       critMultiInput,
       speedInput
     ].forEach(input => {
-      input.addEventListener("input", updatePreview);
+      input.addEventListener("input", () => {
+        updatePreview();
+        saveSetup();
+      });
     });
 
-    setWeapon("sword");
+    loadSetup();
+    setWeapon(weapon, false);
     updatePreview();
   </script>
 </body>
