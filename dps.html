@@ -7,26 +7,6 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
-    .preview-layout {
-      display: grid;
-      grid-template-columns: 96px 1fr;
-      gap: 14px;
-      align-items: stretch;
-      margin-bottom: 16px;
-    }
-
-    .equip-card {
-      display: none;
-      align-items: center;
-      justify-content: center;
-      min-height: 162px;
-      padding: 12px;
-    }
-
-    .equip-card.visible {
-      display: flex;
-    }
-
     .char-equip-slot {
       width: 72px;
       height: 72px;
@@ -38,6 +18,7 @@
       border: 2px dashed rgba(255,255,255,0.12);
       background: #181818;
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+      flex: 0 0 auto;
     }
 
     .char-equip-slot.filled {
@@ -60,25 +41,94 @@
       100% { box-shadow: 0 0 0 1px rgba(249,168,37,0.20), 0 0 10px rgba(249,168,37,0.12), inset 0 0 10px rgba(249,168,37,0.05); }
     }
 
+    .attack-layout {
+      display: grid;
+      grid-template-columns: 90px 1fr;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .attack-stats {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 0;
+    }
+
+    .preview-card {
+      display: none;
+      margin-bottom: 16px;
+    }
+
+    .preview-card.visible {
+      display: block;
+    }
+
+    .preview-title {
+      font-size: 12px;
+      color: var(--red);
+      font-weight: 800;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .preview-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .preview-row:last-child {
+      border-bottom: none;
+    }
+
+    .preview-label {
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .preview-value {
+      font-size: 13px;
+      color: #fff;
+      font-weight: 700;
+      text-align: right;
+      min-width: 0;
+    }
+
+    .preview-extra {
+      color: var(--green);
+      font-size: 11px;
+    }
+
     @media (max-width: 760px) {
-  .preview-layout {
-    grid-template-columns: 84px 1fr;
-    gap: 10px;
-    align-items: stretch;
-  }
+      .attack-layout {
+        grid-template-columns: 70px 1fr;
+        gap: 10px;
+        align-items: center;
+      }
 
-  .equip-card {
-    display: flex;
-    min-height: auto;
-    padding: 8px;
-  }
+      .char-equip-slot {
+        width: 64px;
+        height: 64px;
+        border-radius: 14px;
+      }
 
-  .char-equip-slot {
-    width: 68px;
-    height: 68px;
-    border-radius: 14px;
-  }
-}
+      .preview-label {
+        font-size: 11px;
+      }
+
+      .preview-value {
+        font-size: 12px;
+      }
+
+      .preview-extra {
+        font-size: 10px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -93,42 +143,42 @@
       </div>
 
       <div class="app-body">
-        <div class="preview-layout">
-          <div class="settings-card equip-card" id="equipCard">
+        <div class="settings-card preview-card" id="previewCard">
+          <div class="preview-title">⚔ Атака</div>
+
+          <div class="attack-layout">
             <div class="char-equip-slot filled rarity-legendary" id="equipSlot">
               <span id="equipIcon" style="font-size:28px">🗡️</span>
             </div>
-          </div>
 
-          <div class="settings-card preview-card" id="previewCard">
-            <div class="preview-title">⚔ Атака</div>
+            <div class="attack-stats">
+              <div class="preview-row">
+                <span class="preview-label">⚔️ Урон</span>
+                <span class="preview-value" id="previewDamage">
+                  0 <span class="preview-extra">(0 +0%)</span>
+                </span>
+              </div>
 
-            <div class="preview-row">
-              <span class="preview-label">⚔️ Урон</span>
-              <span class="preview-value" id="previewDamage">
-                0 <span class="preview-extra">(0 +0%)</span>
-              </span>
-            </div>
+              <div class="preview-row" id="previewCritRow">
+                <span class="preview-label">🎯 Крит</span>
+                <span class="preview-value" id="previewCrit">
+                  0.00% <span class="preview-extra">+0.00%</span>
+                </span>
+              </div>
 
-            <div class="preview-row" id="previewCritRow">
-              <span class="preview-label">🎯 Крит</span>
-              <span class="preview-value" id="previewCrit">
-                0.00% <span class="preview-extra">+0.00%</span>
-              </span>
-            </div>
+              <div class="preview-row">
+                <span class="preview-label">💨 Скорость</span>
+                <span class="preview-value" id="previewSpeed">
+                  -0.00% <span class="preview-extra">КД</span>
+                </span>
+              </div>
 
-            <div class="preview-row">
-              <span class="preview-label">💨 Скорость</span>
-              <span class="preview-value" id="previewSpeed">
-                -0.00% <span class="preview-extra">КД</span>
-              </span>
-            </div>
-
-            <div class="preview-row">
-              <span class="preview-label">⚡ DPS</span>
-              <span class="preview-value" id="previewDps">
-                0.00 <span class="preview-extra">DPS</span>
-              </span>
+              <div class="preview-row">
+                <span class="preview-label">⚡ DPS</span>
+                <span class="preview-value" id="previewDps">
+                  0.00 <span class="preview-extra">DPS</span>
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -198,7 +248,6 @@
     const previewCard = document.getElementById("previewCard");
     const previewCritRow = document.getElementById("previewCritRow");
     const critCard = document.getElementById("critCard");
-    const equipCard = document.getElementById("equipCard");
     const equipIcon = document.getElementById("equipIcon");
 
     function n(v) {
@@ -322,7 +371,6 @@
     function updatePreview() {
       const visible = hasAnyValue();
       previewCard.classList.toggle("visible", visible);
-      equipCard.classList.toggle("visible", visible);
 
       if (!visible) {
         return;
