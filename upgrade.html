@@ -299,15 +299,21 @@
         return;
       }
 
-      if (currentDamage <= 0) {
-        showError("Введи корректный текущий урон.");
-        return;
-      }
+const upgradeCost = calculateUpgradeCost(currentLevel, targetLevel);
+document.getElementById("outCost").textContent = `${upgradeCost.toLocaleString("ru-RU")} ✨`;
 
-      if (currentLevel > 0 && currentCritMultiplier <= 0) {
-        showError("Для уровня выше 0 введи текущий крит множитель.");
-        return;
-      }
+// дальше проверяем урон отдельно
+if (currentDamage <= 0) {
+  document.getElementById("outBaseDamage").textContent = "—";
+  document.getElementById("outTargetDamage").textContent = "—";
+  document.getElementById("outTargetCrit").textContent = "—";
+  return;
+}
+
+if (currentLevel > 0 && currentCritMultiplier <= 0) {
+  document.getElementById("outTargetCrit").textContent = "—";
+  return;
+}
 
       const baseDamage =
         currentLevel === 0
