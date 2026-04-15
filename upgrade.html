@@ -122,17 +122,17 @@
           <div class="upgrade-result-grid">
             <div class="upgrade-result-item">
               <div class="upgrade-result-label">Стоимость апгрейда</div>
-              <div class="upgrade-result-value" id="outCost">0 ✨</div>
+              <div class="upgrade-result-value" id="outCost">200 ✨</div>
             </div>
 
             <div class="upgrade-result-item">
               <div class="upgrade-result-label">Урон 0 уровня</div>
-              <div class="upgrade-result-value" id="outBaseDamage">0</div>
+              <div class="upgrade-result-value" id="outBaseDamage">—</div>
             </div>
 
             <div class="upgrade-result-item">
               <div class="upgrade-result-label">Целевой урон</div>
-              <div class="upgrade-result-value" id="outTargetDamage">0</div>
+              <div class="upgrade-result-value" id="outTargetDamage">—</div>
             </div>
 
             <div class="upgrade-result-item">
@@ -148,7 +148,7 @@
   </div>
 
   <script>
-    const UPGRADE_STORAGE_KEY = "overthrow_sword_upgrade_v2";
+    const UPGRADE_STORAGE_KEY = "overthrow_sword_upgrade_v3";
 
     const currentLevelEl = document.getElementById("currentLevel");
     const targetLevelEl = document.getElementById("targetLevel");
@@ -195,14 +195,14 @@
       return floor2(value).toFixed(2);
     }
 
-    function showError(message) {
+    function setError(message) {
+      if (!message) {
+        errorBox.style.display = "none";
+        errorBox.textContent = "";
+        return;
+      }
       errorBox.style.display = "block";
       errorBox.textContent = message;
-    }
-
-    function hideError() {
-      errorBox.style.display = "none";
-      errorBox.textContent = "";
     }
 
     function clampInt(value, min, max, fallback) {
@@ -222,20 +222,19 @@
       return clampInt(targetLevelEl.value, 1, 90, 1);
     }
 
-    function normalizeLevels(changedField = "") {
+    function normalizeLevels() {
       let currentLevel = getCurrentLevel();
       let targetLevel = getTargetLevelRaw();
+
+      if (currentLevel >= 90) {
+        currentLevel = 89;
+      }
 
       if (targetLevel <= currentLevel) {
         targetLevel = currentLevel + 1;
       }
 
       if (targetLevel > 90) {
-        targetLevel = 90;
-      }
-
-      if (currentLevel >= 90) {
-        currentLevel = 89;
         targetLevel = 90;
       }
 
@@ -286,34 +285,33 @@
       return total;
     }
 
-    function calculate() {
-      hideError();
+    function updateCostBlock(currentLevel, targetLevel) {
+      const cost = calculateUpgradeCost(currentLevel, targetLevel);
+      document.getElementById("outCost").textContent = `${cost.toLocaleString("ru-RU")} ✨`;
+    }
 
-      const currentLevel = getCurrentLevel();
-      const targetLevel = getTargetLevelRaw();
+    function updateStatsBlock(currentLevel, targetLevel) {
       const currentDamage = parseNum(currentDamageEl.value);
       const currentCritMultiplier = parseNum(currentCritMultiplierEl.value);
 
-      if (targetLevel <= currentLevel) {
-        showError("Целевой уровень должен быть больше текущего.");
+      const baseDamageEl = document.getElementById("outBaseDamage");
+      const targetDamageEl = document.getElementById("outTargetDamage");
+      const targetCritEl = document.getElementById("outTargetCrit");
+
+      const targetCrit = 1.50 + 0.008 * targetLevel;
+      targetCritEl.textContent = format2Down(targetCrit);
+
+      if (currentDamage <= 0) {
+        baseDamageEl.textContent = "—";
+        targetDamageEl.textContent = "—";
         return;
       }
 
-const upgradeCost = calculateUpgradeCost(currentLevel, targetLevel);
-document.getElementById("outCost").textContent = `${upgradeCost.toLocaleString("ru-RU")} ✨`;
-
-// дальше проверяем урон отдельно
-if (currentDamage <= 0) {
-  document.getElementById("outBaseDamage").textContent = "—";
-  document.getElementById("outTargetDamage").textContent = "—";
-  document.getElementById("outTargetCrit").textContent = "—";
-  return;
-}
-
-if (currentLevel > 0 && currentCritMultiplier <= 0) {
-  document.getElementById("outTargetCrit").textContent = "—";
-  return;
-}
+      if (currentLevel > 0 && currentCritMultiplier <= 0) {
+        baseDamageEl.textContent = "—";
+        targetDamageEl.textContent = "—";
+        return;
+      }
 
       const baseDamage =
         currentLevel === 0
@@ -321,56 +319,57 @@ if (currentLevel > 0 && currentCritMultiplier <= 0) {
           : currentDamage / (1 + 0.09 * currentLevel);
 
       const targetDamage = baseDamage * (1 + 0.09 * targetLevel);
-      const targetCrit = 1.50 + 0.008 * targetLevel;
-      const upgradeCost = calculateUpgradeCost(currentLevel, targetLevel);
 
-      document.getElementById("outCost").textContent = `${upgradeCost.toLocaleString("ru-RU")} ✨`;
-      document.getElementById("outBaseDamage").textContent = formatIntDown(baseDamage);
-      document.getElementById("outTargetDamage").textContent = formatIntDown(targetDamage);
-      document.getElementById("outTargetCrit").textContent = format2Down(targetCrit);
+      baseDamageEl.textContent = formatIntDown(baseDamage);
+      targetDamageEl.textContent = formatIntDown(targetDamage);
     }
 
-    function recalcAll(changedField = "") {
-      normalizeLevels(changedField);
+    function updateAll() {
+      normalizeLevels();
+
+      const currentLevel = getCurrentLevel();
+      const targetLevel = getTargetLevelRaw();
+
       updateCritVisibility();
+      updateCostBlock(currentLevel, targetLevel);
+      updateStatsBlock(currentLevel, targetLevel);
       saveState();
-      calculate();
+      setError("");
+    }
+
+    function setCurrentLevel(next) {
+      currentLevelEl.value = String(clampInt(next, 0, 89, 0));
+      updateAll();
+    }
+
+    function setTargetLevel(next) {
+      targetLevelEl.value = String(clampInt(next, 1, 90, 1));
+      updateAll();
     }
 
     currentMinusBtn.addEventListener("click", () => {
-      const next = Math.max(0, getCurrentLevel() - 1);
-      currentLevelEl.value = String(next);
-      recalcAll("current");
+      setCurrentLevel(getCurrentLevel() - 1);
     });
 
     currentPlusBtn.addEventListener("click", () => {
-      const next = Math.min(89, getCurrentLevel() + 1);
-      currentLevelEl.value = String(next);
-      recalcAll("current");
+      setCurrentLevel(getCurrentLevel() + 1);
     });
 
     targetMinusBtn.addEventListener("click", () => {
-      const minAllowed = getCurrentLevel() + 1;
-      const next = Math.max(minAllowed, getTargetLevelRaw() - 1);
-      targetLevelEl.value = String(next);
-      recalcAll("target");
+      setTargetLevel(getTargetLevelRaw() - 1);
     });
 
     targetPlusBtn.addEventListener("click", () => {
-      const next = Math.min(90, getTargetLevelRaw() + 1);
-      targetLevelEl.value = String(next);
-      recalcAll("target");
+      setTargetLevel(getTargetLevelRaw() + 1);
     });
 
     [currentLevelEl, targetLevelEl, currentDamageEl, currentCritMultiplierEl].forEach(el => {
-      el.addEventListener("input", () => recalcAll());
-      el.addEventListener("change", () => recalcAll());
+      el.addEventListener("input", updateAll);
+      el.addEventListener("change", updateAll);
     });
 
     loadState();
-    normalizeLevels();
-    updateCritVisibility();
-    calculate();
+    updateAll();
 
     document.addEventListener("gesturestart", function (e) {
       e.preventDefault();
