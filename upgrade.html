@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  >
+  <title>Апгрейд меча</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .upgrade-result-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .upgrade-result-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .upgrade-result-item:last-child {
+      border-bottom: none;
+    }
+
+    .upgrade-result-label {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .upgrade-result-value {
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .level-control {
+      display: grid;
+      grid-template-columns: 44px 1fr 44px;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .level-btn {
+      min-height: 44px;
+      padding: 0;
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .level-input {
+      text-align: center;
+      font-weight: 700;
+      -moz-appearance: textfield;
+    }
+
+    .level-input::-webkit-outer-spin-button,
+    .level-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="topbar">
+      <a class="btn" href="index.html">← На главную</a>
+    </div>
+
+    <div class="app-shell">
+      <div class="app-header">
+        <h3>🗡️ Калькулятор апгрейда меча</h3>
+      </div>
+
+      <div class="app-body">
+        <div class="settings-card">
+          <div class="settings-section-title">Параметры</div>
+
+          <div class="grid">
+            <div class="field">
+              <label for="currentLevel">Текущий уровень меча</label>
+              <div class="level-control">
+                <button type="button" class="btn level-btn" id="currentMinus">-</button>
+                <input id="currentLevel" class="level-input" type="number" min="0" max="89" inputmode="numeric" value="0">
+                <button type="button" class="btn level-btn" id="currentPlus">+</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="targetLevel">Целевой уровень меча</label>
+              <div class="level-control">
+                <button type="button" class="btn level-btn" id="targetMinus">-</button>
+                <input id="targetLevel" class="level-input" type="number" min="1" max="90" inputmode="numeric" value="1">
+                <button type="button" class="btn level-btn" id="targetPlus">+</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="currentDamage">Текущий урон</label>
+              <input id="currentDamage" type="text" placeholder="Например: 2985">
+            </div>
+
+            <div class="field hidden" id="critFieldWrap">
+              <label for="currentCritMultiplier">Текущий крит множитель</label>
+              <input id="currentCritMultiplier" type="text" placeholder="Например: 1.62">
+            </div>
+          </div>
+
+          <div class="summary" style="margin-top:14px;">
+            Для меча: +9% урона от 0 уровня за каждый уровень.<br>
+            Крит множитель: 1.50 на 0 уровне, дальше +0.008 за уровень.
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-section-title">Результат</div>
+
+          <div class="upgrade-result-grid">
+            <div class="upgrade-result-item">
+              <div class="upgrade-result-label">Стоимость апгрейда</div>
+              <div class="upgrade-result-value" id="outCost">0 ✨</div>
+            </div>
+
+            <div class="upgrade-result-item">
+              <div class="upgrade-result-label">Урон 0 уровня</div>
+              <div class="upgrade-result-value" id="outBaseDamage">0</div>
+            </div>
+
+            <div class="upgrade-result-item">
+              <div class="upgrade-result-label">Целевой урон</div>
+              <div class="upgrade-result-value" id="outTargetDamage">0</div>
+            </div>
+
+            <div class="upgrade-result-item">
+              <div class="upgrade-result-label">Целевой крит множитель</div>
+              <div class="upgrade-result-value" id="outTargetCrit">1.50</div>
+            </div>
+          </div>
+
+          <div class="error" id="errorBox"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const UPGRADE_STORAGE_KEY = "overthrow_sword_upgrade_v2";
+
+    const currentLevelEl = document.getElementById("currentLevel");
+    const targetLevelEl = document.getElementById("targetLevel");
+    const currentDamageEl = document.getElementById("currentDamage");
+    const currentCritMultiplierEl = document.getElementById("currentCritMultiplier");
+    const critFieldWrap = document.getElementById("critFieldWrap");
+    const errorBox = document.getElementById("errorBox");
+
+    const currentMinusBtn = document.getElementById("currentMinus");
+    const currentPlusBtn = document.getElementById("currentPlus");
+    const targetMinusBtn = document.getElementById("targetMinus");
+    const targetPlusBtn = document.getElementById("targetPlus");
+
+    const COST_RANGES = [
+      { from: 1, to: 10, cost: 200 },
+      { from: 11, to: 20, cost: 400 },
+      { from: 21, to: 30, cost: 700 },
+      { from: 31, to: 40, cost: 1600 },
+      { from: 41, to: 50, cost: 3000 },
+      { from: 51, to: 60, cost: 5000 },
+      { from: 61, to: 70, cost: 9000 },
+      { from: 71, to: 80, cost: 15000 },
+      { from: 81, to: 90, cost: 25000 }
+    ];
+
+    function parseNum(v) {
+      if (!v) return 0;
+      return Number(String(v).replace(",", ".").trim()) || 0;
+    }
+
+    function floorInt(value) {
+      return Math.floor(value);
+    }
+
+    function floor2(value) {
+      return Math.floor(value * 100) / 100;
+    }
+
+    function formatIntDown(value) {
+      return String(floorInt(value));
+    }
+
+    function format2Down(value) {
+      return floor2(value).toFixed(2);
+    }
+
+    function showError(message) {
+      errorBox.style.display = "block";
+      errorBox.textContent = message;
+    }
+
+    function hideError() {
+      errorBox.style.display = "none";
+      errorBox.textContent = "";
+    }
+
+    function clampInt(value, min, max, fallback) {
+      let n = Number(value);
+      if (!Number.isFinite(n)) n = fallback;
+      n = Math.floor(n);
+      if (n < min) n = min;
+      if (n > max) n = max;
+      return n;
+    }
+
+    function getCurrentLevel() {
+      return clampInt(currentLevelEl.value, 0, 89, 0);
+    }
+
+    function getTargetLevelRaw() {
+      return clampInt(targetLevelEl.value, 1, 90, 1);
+    }
+
+    function normalizeLevels(changedField = "") {
+      let currentLevel = getCurrentLevel();
+      let targetLevel = getTargetLevelRaw();
+
+      if (targetLevel <= currentLevel) {
+        targetLevel = currentLevel + 1;
+      }
+
+      if (targetLevel > 90) {
+        targetLevel = 90;
+      }
+
+      if (currentLevel >= 90) {
+        currentLevel = 89;
+        targetLevel = 90;
+      }
+
+      currentLevelEl.value = String(currentLevel);
+      targetLevelEl.value = String(targetLevel);
+    }
+
+    function updateCritVisibility() {
+      const currentLevel = getCurrentLevel();
+      critFieldWrap.classList.toggle("hidden", currentLevel === 0);
+    }
+
+    function saveState() {
+      const data = {
+        currentLevel: currentLevelEl.value,
+        targetLevel: targetLevelEl.value,
+        currentDamage: currentDamageEl.value,
+        currentCritMultiplier: currentCritMultiplierEl.value
+      };
+      localStorage.setItem(UPGRADE_STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function loadState() {
+      const raw = localStorage.getItem(UPGRADE_STORAGE_KEY);
+      if (!raw) return;
+
+      try {
+        const data = JSON.parse(raw);
+        if (data.currentLevel != null) currentLevelEl.value = String(data.currentLevel);
+        if (data.targetLevel != null) targetLevelEl.value = String(data.targetLevel);
+        currentDamageEl.value = data.currentDamage || "";
+        currentCritMultiplierEl.value = data.currentCritMultiplier || "";
+      } catch (e) {
+        console.error("Не удалось загрузить состояние апгрейда", e);
+      }
+    }
+
+    function getStepCost(nextLevel) {
+      const range = COST_RANGES.find(r => nextLevel >= r.from && nextLevel <= r.to);
+      return range ? range.cost : 0;
+    }
+
+    function calculateUpgradeCost(currentLevel, targetLevel) {
+      let total = 0;
+      for (let lvl = currentLevel + 1; lvl <= targetLevel; lvl++) {
+        total += getStepCost(lvl);
+      }
+      return total;
+    }
+
+    function calculate() {
+      hideError();
+
+      const currentLevel = getCurrentLevel();
+      const targetLevel = getTargetLevelRaw();
+      const currentDamage = parseNum(currentDamageEl.value);
+      const currentCritMultiplier = parseNum(currentCritMultiplierEl.value);
+
+      if (targetLevel <= currentLevel) {
+        showError("Целевой уровень должен быть больше текущего.");
+        return;
+      }
+
+      if (currentDamage <= 0) {
+        showError("Введи корректный текущий урон.");
+        return;
+      }
+
+      if (currentLevel > 0 && currentCritMultiplier <= 0) {
+        showError("Для уровня выше 0 введи текущий крит множитель.");
+        return;
+      }
+
+      const baseDamage =
+        currentLevel === 0
+          ? currentDamage
+          : currentDamage / (1 + 0.09 * currentLevel);
+
+      const targetDamage = baseDamage * (1 + 0.09 * targetLevel);
+      const targetCrit = 1.50 + 0.008 * targetLevel;
+      const upgradeCost = calculateUpgradeCost(currentLevel, targetLevel);
+
+      document.getElementById("outCost").textContent = `${upgradeCost.toLocaleString("ru-RU")} ✨`;
+      document.getElementById("outBaseDamage").textContent = formatIntDown(baseDamage);
+      document.getElementById("outTargetDamage").textContent = formatIntDown(targetDamage);
+      document.getElementById("outTargetCrit").textContent = format2Down(targetCrit);
+    }
+
+    function recalcAll(changedField = "") {
+      normalizeLevels(changedField);
+      updateCritVisibility();
+      saveState();
+      calculate();
+    }
+
+    currentMinusBtn.addEventListener("click", () => {
+      const next = Math.max(0, getCurrentLevel() - 1);
+      currentLevelEl.value = String(next);
+      recalcAll("current");
+    });
+
+    currentPlusBtn.addEventListener("click", () => {
+      const next = Math.min(89, getCurrentLevel() + 1);
+      currentLevelEl.value = String(next);
+      recalcAll("current");
+    });
+
+    targetMinusBtn.addEventListener("click", () => {
+      const minAllowed = getCurrentLevel() + 1;
+      const next = Math.max(minAllowed, getTargetLevelRaw() - 1);
+      targetLevelEl.value = String(next);
+      recalcAll("target");
+    });
+
+    targetPlusBtn.addEventListener("click", () => {
+      const next = Math.min(90, getTargetLevelRaw() + 1);
+      targetLevelEl.value = String(next);
+      recalcAll("target");
+    });
+
+    [currentLevelEl, targetLevelEl, currentDamageEl, currentCritMultiplierEl].forEach(el => {
+      el.addEventListener("input", () => recalcAll());
+      el.addEventListener("change", () => recalcAll());
+    });
+
+    loadState();
+    normalizeLevels();
+    updateCritVisibility();
+    calculate();
+
+    document.addEventListener("gesturestart", function (e) {
+      e.preventDefault();
+    });
+
+    let lastTouchEnd = 0;
+    document.addEventListener("touchend", function (e) {
+      const now = Date.now();
+      if (now - lastTouchEnd <= 300) {
+        e.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, { passive: false });
+  </script>
+</body>
+</html>
