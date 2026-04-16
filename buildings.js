@@ -269,9 +269,24 @@ function getCoreTotals() {
     regen: 1
   };
 
+  const grouped = {
+    income: [],
+    capacity: [],
+    hp: [],
+    regen: []
+  };
+
   for (const core of appState.cores) {
     if (!core) continue;
-    totals[core.type] *= coreMultiplier(core.level);
+    grouped[core.type].push(coreMultiplier(core.level));
+  }
+
+  for (const type of Object.keys(grouped)) {
+    if (grouped[type].length === 0) {
+      totals[type] = 1;
+    } else {
+      totals[type] = grouped[type].reduce((sum, value) => sum + value, 0);
+    }
   }
 
   return totals;
