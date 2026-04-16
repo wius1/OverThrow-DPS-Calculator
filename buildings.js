@@ -41,6 +41,7 @@ const coresHeader = document.getElementById("coresHeader");
 const coresNextUnlock = document.getElementById("coresNextUnlock");
 const coresGrid = document.getElementById("coresGrid");
 const coreTotalsList = document.getElementById("coreTotalsList");
+const clearCoresBtn = document.getElementById("clearCoresBtn");
 
 const coreModalBackdrop = document.getElementById("coreModalBackdrop");
 const coreModalClose = document.getElementById("coreModalClose");
@@ -69,7 +70,7 @@ const BUILDING_TIERS = [
   { min: 100, max: 109, icon: "🏗️", name: "Стройплощадка" },
   { min: 110, max: 119, icon: "🏭", name: "Завод" },
   { min: 120, max: 129, icon: "🏢", name: "Офисный центр" },
-  { min: 130, max: 130, icon: "🏦", name: "Банк" }
+  { min: 130, max: 130, icon: "❓", name: "???" }
 ];
 
 let currentEditingCoreIndex = null;
@@ -276,20 +277,32 @@ function getCoreTotals() {
   return totals;
 }
 
-function renderCoreTotals() {
-  const totals = getCoreTotals();
-
-  coreTotalsList.innerHTML = `
-    <div class="core-total-item"><span>✴️ Доход</span><strong>x${formatCoreMultiplierFromValue(totals.income)}</strong></div>
-    <div class="core-total-item"><span>✳️ Вместимость</span><strong>x${formatCoreMultiplierFromValue(totals.capacity)}</strong></div>
-    <div class="core-total-item"><span>❤️ Здоровье</span><strong>x${formatCoreMultiplierFromValue(totals.hp)}</strong></div>
-    <div class="core-total-item"><span>♻️ Реген</span><strong>x${formatCoreMultiplierFromValue(totals.regen)}</strong></div>
-  `;
-}
-
 function formatCoreMultiplierFromValue(value) {
   const floored = Math.floor(value * 100) / 100;
   return floored % 1 === 0 ? floored.toFixed(0) : floored.toFixed(2);
+}
+
+function renderCoreTotals() {
+  const totals = getCoreTotals();
+  const items = [];
+
+  if (totals.income > 1) {
+    items.push(`<div class="core-total-item"><span>✴️ Доход</span><strong>x${formatCoreMultiplierFromValue(totals.income)}</strong></div>`);
+  }
+
+  if (totals.capacity > 1) {
+    items.push(`<div class="core-total-item"><span>✳️ Вместимость</span><strong>x${formatCoreMultiplierFromValue(totals.capacity)}</strong></div>`);
+  }
+
+  if (totals.hp > 1) {
+    items.push(`<div class="core-total-item"><span>❤️ Здоровье</span><strong>x${formatCoreMultiplierFromValue(totals.hp)}</strong></div>`);
+  }
+
+  if (totals.regen > 1) {
+    items.push(`<div class="core-total-item"><span>♻️ Реген</span><strong>x${formatCoreMultiplierFromValue(totals.regen)}</strong></div>`);
+  }
+
+  coreTotalsList.innerHTML = items.join("");
 }
 
 function renderCores(buildingLevel) {
@@ -509,6 +522,12 @@ function bindControls() {
     if (e.target === coreModalBackdrop) {
       closeCoreModal();
     }
+  });
+
+  clearCoresBtn.addEventListener("click", () => {
+    appState.cores = defaultCoreSlots();
+    saveState();
+    renderLevel(levelInput.value);
   });
 }
 
