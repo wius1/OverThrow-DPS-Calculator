@@ -126,6 +126,51 @@
       color: #ffb4b4;
       border: 1px solid rgba(244, 67, 54, 0.22);
     }
+
+    .boost-toggle {
+      margin-top: 12px;
+      color: #ddd;
+      font-size: 14px;
+    }
+
+    .boosts-grid {
+      display: none;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .boosts-grid.visible {
+      display: grid;
+    }
+
+    .boost-card {
+      background: #1f2333;
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+
+    .boost-val {
+      color: #fff;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .boost-label {
+      color: #aaa;
+      font-size: 12px;
+    }
+
+    .boost-card input {
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 760px) {
+      .boosts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
@@ -151,6 +196,37 @@
             </div>
 
             <input id="levelRange" class="building-range" type="range" min="1" max="130" value="1">
+
+            <label class="boost-toggle">
+              <input id="boostsToggle" type="checkbox">
+              Бусты от фермы и клана
+            </label>
+
+            <div class="boosts-grid" id="boostsGrid">
+              <div class="boost-card">
+                <div class="boost-val">🌿 +<span id="farmBoostPreview">0</span>%</div>
+                <div class="boost-label">Буст от фермы</div>
+                <input id="farmBoost" type="number" value="0" step="1">
+              </div>
+
+              <div class="boost-card">
+                <div class="boost-val">⚡ +<span id="clanIncomeBoostPreview">0</span>%</div>
+                <div class="boost-label">Доход клана</div>
+                <input id="clanIncomeBoost" type="number" value="0" step="1">
+              </div>
+
+              <div class="boost-card">
+                <div class="boost-val">🛡️ +<span id="clanDefenseBoostPreview">0</span>%</div>
+                <div class="boost-label">Защита клана</div>
+                <input id="clanDefenseBoost" type="number" value="0" step="1">
+              </div>
+
+              <div class="boost-card">
+                <div class="boost-val" style="color:#00ff88">🚀 x<span id="clanMultiplierPreview">1</span></div>
+                <div class="boost-label">Буст клана</div>
+                <input id="clanMultiplier" type="number" value="1" step="0.1" min="1">
+              </div>
+            </div>
 
             <div class="building-error" id="buildingError"></div>
           </div>
