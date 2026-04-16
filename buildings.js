@@ -147,7 +147,7 @@ function formatCoreMultiplier(level) {
 }
 
 function getUnlockedCoreSlots(buildingLevel) {
-  return Math.min(MAX_CORE_SLOTS, Math.floor((buildingLevel - 1) / 20) + 1);
+  return Math.min(MAX_CORE_SLOTS, Math.floor(buildingLevel / 20) + 1);
 }
 
 function getNextCoreUnlockLevel(buildingLevel) {
