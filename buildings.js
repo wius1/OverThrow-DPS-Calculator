@@ -1,4 +1,4 @@
-const BUILDING_STORAGE_KEY = "overthrow_building_state_v3";
+const BUILDING_STORAGE_KEY = "overthrow_building_state_v4";
 const STATS_FILE = "building_stats.txt";
 const MAX_CORE_SLOTS = 10;
 
@@ -27,6 +27,19 @@ const farmBoostPreview = document.getElementById("farmBoostPreview");
 const clanIncomeBoostPreview = document.getElementById("clanIncomeBoostPreview");
 const clanDefenseBoostPreview = document.getElementById("clanDefenseBoostPreview");
 const clanMultiplierPreview = document.getElementById("clanMultiplierPreview");
+
+const skillBoostsToggle = document.getElementById("skillBoostsToggle");
+const skillBoostsGrid = document.getElementById("skillBoostsGrid");
+
+const skillIncomeBoost = document.getElementById("skillIncomeBoost");
+const skillCapacityBoost = document.getElementById("skillCapacityBoost");
+const skillHpBoost = document.getElementById("skillHpBoost");
+const skillRegenBoost = document.getElementById("skillRegenBoost");
+
+const skillIncomePreview = document.getElementById("skillIncomePreview");
+const skillCapacityPreview = document.getElementById("skillCapacityPreview");
+const skillHpPreview = document.getElementById("skillHpPreview");
+const skillRegenPreview = document.getElementById("skillRegenPreview");
 
 const buildingIcon = document.getElementById("buildingIcon");
 const buildingName = document.getElementById("buildingName");
@@ -70,7 +83,7 @@ const BUILDING_TIERS = [
   { min: 100, max: 109, icon: "🏗️", name: "Стройплощадка" },
   { min: 110, max: 119, icon: "🏭", name: "Завод" },
   { min: 120, max: 129, icon: "🏢", name: "Офисный центр" },
-  { min: 130, max: 130, icon: "❓", name: "???" }
+  { min: 130, max: 130, icon: "🏦", name: "Банк" }
 ];
 
 let currentEditingCoreIndex = null;
@@ -103,6 +116,15 @@ function clampLevel(value) {
 function num(value, fallback = 0) {
   const n = Number(value);
   return Number.isFinite(n) ? n : fallback;
+}
+
+function clampPercent20(value) {
+  let n = Number(value);
+  if (!Number.isFinite(n)) n = 0;
+  n = Math.floor(n);
+  if (n < 0) n = 0;
+  if (n > 20) n = 20;
+  return n;
 }
 
 function clampCoreLevel(value) {
@@ -146,6 +168,11 @@ function saveState() {
     clanIncomeBoost: clanIncomeBoost.value,
     clanDefenseBoost: clanDefenseBoost.value,
     clanMultiplier: clanMultiplier.value,
+    skillBoostsEnabled: skillBoostsToggle.checked,
+    skillIncomeBoost: skillIncomeBoost.value,
+    skillCapacityBoost: skillCapacityBoost.value,
+    skillHpBoost: skillHpBoost.value,
+    skillRegenBoost: skillRegenBoost.value,
     cores: getSanitizedCoreState()
   };
 
@@ -162,6 +189,11 @@ function loadSavedState() {
       clanIncomeBoost: "0",
       clanDefenseBoost: "0",
       clanMultiplier: "1",
+      skillBoostsEnabled: false,
+      skillIncomeBoost: "0",
+      skillCapacityBoost: "0",
+      skillHpBoost: "0",
+      skillRegenBoost: "0",
       cores: defaultCoreSlots()
     };
   }
@@ -175,6 +207,11 @@ function loadSavedState() {
       clanIncomeBoost: state.clanIncomeBoost ?? "0",
       clanDefenseBoost: state.clanDefenseBoost ?? "0",
       clanMultiplier: state.clanMultiplier ?? "1",
+      skillBoostsEnabled: Boolean(state.skillBoostsEnabled),
+      skillIncomeBoost: state.skillIncomeBoost ?? "0",
+      skillCapacityBoost: state.skillCapacityBoost ?? "0",
+      skillHpBoost: state.skillHpBoost ?? "0",
+      skillRegenBoost: state.skillRegenBoost ?? "0",
       cores: sanitizeLoadedCores(state.cores)
     };
   } catch {
@@ -185,6 +222,11 @@ function loadSavedState() {
       clanIncomeBoost: "0",
       clanDefenseBoost: "0",
       clanMultiplier: "1",
+      skillBoostsEnabled: false,
+      skillIncomeBoost: "0",
+      skillCapacityBoost: "0",
+      skillHpBoost: "0",
+      skillRegenBoost: "0",
       cores: defaultCoreSlots()
     };
   }
@@ -259,6 +301,22 @@ function updateBoostPreviews() {
 
 function updateBoostVisibility() {
   boostsGrid.classList.toggle("visible", boostsToggle.checked);
+}
+
+function updateSkillBoostPreviews() {
+  skillIncomeBoost.value = String(clampPercent20(skillIncomeBoost.value));
+  skillCapacityBoost.value = String(clampPercent20(skillCapacityBoost.value));
+  skillHpBoost.value = String(clampPercent20(skillHpBoost.value));
+  skillRegenBoost.value = String(clampPercent20(skillRegenBoost.value));
+
+  skillIncomePreview.textContent = skillIncomeBoost.value;
+  skillCapacityPreview.textContent = skillCapacityBoost.value;
+  skillHpPreview.textContent = skillHpBoost.value;
+  skillRegenPreview.textContent = skillRegenBoost.value;
+}
+
+function updateSkillBoostVisibility() {
+  skillBoostsGrid.classList.toggle("visible", skillBoostsToggle.checked);
 }
 
 function getCoreTotals() {
@@ -424,6 +482,8 @@ function renderLevel(level) {
 
   updateBoostPreviews();
   updateBoostVisibility();
+  updateSkillBoostPreviews();
+  updateSkillBoostVisibility();
   renderCores(safeLevel);
 
   if (!stats) {
@@ -452,6 +512,18 @@ function renderLevel(level) {
 
     income = income * (1 + farm / 100) * (1 + incomeBoost / 100) * multiplier;
     maxHp = maxHp * (1 + defenseBoost / 100);
+  }
+
+  if (skillBoostsToggle.checked) {
+    const skillIncome = clampPercent20(skillIncomeBoost.value);
+    const skillCapacity = clampPercent20(skillCapacityBoost.value);
+    const skillHp = clampPercent20(skillHpBoost.value);
+    const skillRegen = clampPercent20(skillRegenBoost.value);
+
+    income = income * (1 + skillIncome / 100);
+    capacity = capacity * (1 + skillCapacity / 100);
+    maxHp = maxHp * (1 + skillHp / 100);
+    hpRegen = hpRegen * (1 + skillRegen / 100);
   }
 
   statIncome.textContent = `${formatNumber(income)}/ч`;
@@ -501,6 +573,22 @@ function bindControls() {
       appState.clanIncomeBoost = clanIncomeBoost.value;
       appState.clanDefenseBoost = clanDefenseBoost.value;
       appState.clanMultiplier = clanMultiplier.value;
+      renderLevel(levelInput.value);
+    });
+  });
+
+  skillBoostsToggle.addEventListener("change", () => {
+    appState.skillBoostsEnabled = skillBoostsToggle.checked;
+    renderLevel(levelInput.value);
+  });
+
+  [skillIncomeBoost, skillCapacityBoost, skillHpBoost, skillRegenBoost].forEach(input => {
+    input.addEventListener("input", () => {
+      input.value = String(clampPercent20(input.value));
+      appState.skillIncomeBoost = skillIncomeBoost.value;
+      appState.skillCapacityBoost = skillCapacityBoost.value;
+      appState.skillHpBoost = skillHpBoost.value;
+      appState.skillRegenBoost = skillRegenBoost.value;
       renderLevel(levelInput.value);
     });
   });
@@ -556,6 +644,12 @@ async function initBuildings() {
   clanIncomeBoost.value = appState.clanIncomeBoost;
   clanDefenseBoost.value = appState.clanDefenseBoost;
   clanMultiplier.value = appState.clanMultiplier;
+
+  skillBoostsToggle.checked = appState.skillBoostsEnabled;
+  skillIncomeBoost.value = String(clampPercent20(appState.skillIncomeBoost));
+  skillCapacityBoost.value = String(clampPercent20(appState.skillCapacityBoost));
+  skillHpBoost.value = String(clampPercent20(appState.skillHpBoost));
+  skillRegenBoost.value = String(clampPercent20(appState.skillRegenBoost));
 
   try {
     await loadStatsFile();
