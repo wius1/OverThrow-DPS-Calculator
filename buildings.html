@@ -148,14 +148,16 @@
       flex: 0 0 auto;
     }
 
-    .boosts-grid {
+    .boosts-grid,
+    .skill-boosts-grid {
       display: none;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
       margin-top: 12px;
     }
 
-    .boosts-grid.visible {
+    .boosts-grid.visible,
+    .skill-boosts-grid.visible {
       display: grid;
     }
 
@@ -372,6 +374,7 @@
 
     @media (max-width: 760px) {
       .boosts-grid,
+      .skill-boosts-grid,
       .core-type-grid {
         grid-template-columns: 1fr;
       }
@@ -414,26 +417,57 @@
             <div class="boosts-grid" id="boostsGrid">
               <div class="boost-card">
                 <div class="boost-val">🌿 +<span id="farmBoostPreview">0</span>%</div>
-                <div class="boost-label">Буст от фермы (в %: например 15)</div>
+                <div class="boost-label">Буст от фермы</div>
                 <input id="farmBoost" type="number" value="0" step="1">
               </div>
 
               <div class="boost-card">
                 <div class="boost-val">⚡ +<span id="clanIncomeBoostPreview">0</span>%</div>
-                <div class="boost-label">Доход клана (в %: например 8)</div>
+                <div class="boost-label">Доход клана</div>
                 <input id="clanIncomeBoost" type="number" value="0" step="1">
               </div>
 
               <div class="boost-card">
                 <div class="boost-val">🛡️ +<span id="clanDefenseBoostPreview">0</span>%</div>
-                <div class="boost-label">Защита клана (в %: например 20)</div>
+                <div class="boost-label">Защита клана</div>
                 <input id="clanDefenseBoost" type="number" value="0" step="1">
               </div>
 
               <div class="boost-card">
                 <div class="boost-val" style="color:#00ff88">🚀 x<span id="clanMultiplierPreview">1</span></div>
-                <div class="boost-label">Буст клана (коэффициент: например 2.5)</div>
+                <div class="boost-label">Буст клана</div>
                 <input id="clanMultiplier" type="number" value="1" step="0.1" min="1">
+              </div>
+            </div>
+
+            <label class="boost-toggle">
+              <input id="skillBoostsToggle" type="checkbox">
+              <span>Бусты от навыков</span>
+            </label>
+
+            <div class="skill-boosts-grid" id="skillBoostsGrid">
+              <div class="boost-card">
+                <div class="boost-val">💰 +<span id="skillIncomePreview">0</span>%</div>
+                <div class="boost-label">Доход</div>
+                <input id="skillIncomeBoost" type="number" value="0" min="0" max="20" step="1">
+              </div>
+
+              <div class="boost-card">
+                <div class="boost-val">📦 +<span id="skillCapacityPreview">0</span>%</div>
+                <div class="boost-label">Вместимость</div>
+                <input id="skillCapacityBoost" type="number" value="0" min="0" max="20" step="1">
+              </div>
+
+              <div class="boost-card">
+                <div class="boost-val">❤️ +<span id="skillHpPreview">0</span>%</div>
+                <div class="boost-label">Прочность</div>
+                <input id="skillHpBoost" type="number" value="0" min="0" max="20" step="1">
+              </div>
+
+              <div class="boost-card">
+                <div class="boost-val">♻️ +<span id="skillRegenPreview">0</span>%</div>
+                <div class="boost-label">Реген</div>
+                <input id="skillRegenBoost" type="number" value="0" min="0" max="20" step="1">
               </div>
             </div>
 
@@ -475,8 +509,8 @@
 
             <div class="cores-panel">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;">
-                <div class="cores-header" id="coresHeader" style="margin-bottom:0;">🔮 Ядра 1/10 <span style="color:#555;font-weight:400" id="coresNextUnlock"></span></div>
                 <button class="btn" id="clearCoresBtn" type="button">Очистить</button>
+                <div class="cores-header" id="coresHeader" style="margin-bottom:0;">🔮 Ядра 1/10 <span style="color:#555;font-weight:400" id="coresNextUnlock"></span></div>
               </div>
 
               <div class="mine-cores-grid" id="coresGrid"></div>
