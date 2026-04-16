@@ -45,7 +45,7 @@ const BUILDING_TIERS = [
   { min: 100, max: 109, icon: "🏗️", name: "Стройплощадка" },
   { min: 110, max: 119, icon: "🏭", name: "Завод" },
   { min: 120, max: 129, icon: "🏢", name: "Офисный центр" },
-  { min: 130, max: 130, icon: "🏦", name: "Банк" }
+  { min: 130, max: 130, icon: "❓", name: "???" }
 ];
 
 function formatNumber(value) {
