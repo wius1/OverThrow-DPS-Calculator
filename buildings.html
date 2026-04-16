@@ -128,9 +128,24 @@
     }
 
     .boost-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       margin-top: 12px;
       color: #ddd;
       font-size: 14px;
+      line-height: 1.2;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .boost-toggle input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+      accent-color: #4caf50;
+      vertical-align: middle;
+      flex: 0 0 auto;
     }
 
     .boosts-grid {
@@ -166,9 +181,211 @@
       margin-top: 8px;
     }
 
+    .cores-panel {
+      background: #252538;
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-top: 12px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .cores-header {
+      font-size: 12px;
+      font-weight: 600;
+      color: #aaa;
+      margin-bottom: 8px;
+    }
+
+    .mine-cores-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+
+    .core-slot {
+      min-height: 72px;
+      border-radius: 10px;
+      background: #1f2333;
+      border: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.12s ease, opacity 0.12s ease;
+    }
+
+    .core-slot:hover {
+      transform: translateY(-1px);
+    }
+
+    .core-slot.empty {
+      background: #23283a;
+    }
+
+    .core-slot.locked {
+      opacity: 0.25;
+      cursor: default;
+    }
+
+    .slot-plus {
+      font-size: 24px;
+      color: #ddd;
+      line-height: 1;
+    }
+
+    .slot-emoji {
+      font-size: 22px;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .slot-level {
+      font-size: 11px;
+      color: #bbb;
+    }
+
+    .slot-mult {
+      font-size: 11px;
+      color: #fff;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    .cores-total-boost {
+      margin-top: 10px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .core-totals-list {
+      display: grid;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .core-total-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 13px;
+      color: #ddd;
+    }
+
+    .core-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 1000;
+    }
+
+    .core-modal-backdrop.visible {
+      display: flex;
+    }
+
+    .core-modal {
+      width: min(420px, 100%);
+      background: #252538;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 14px;
+    }
+
+    .core-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .core-modal-title {
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .core-type-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .core-type-btn {
+      background: #1f2333;
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #fff;
+      border-radius: 10px;
+      padding: 10px;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .core-type-btn.active {
+      border-color: #4caf50;
+      background: #223228;
+    }
+
+    .core-level-row {
+      display: grid;
+      grid-template-columns: 44px 1fr 44px;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .core-level-btn {
+      min-height: 44px;
+      padding: 0;
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .core-level-input {
+      text-align: center;
+      font-weight: 700;
+      -moz-appearance: textfield;
+    }
+
+    .core-level-input::-webkit-outer-spin-button,
+    .core-level-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .core-preview {
+      background: #1f2333;
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      color: #fff;
+    }
+
+    .core-modal-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .core-modal-actions .btn {
+      flex: 1;
+    }
+
     @media (max-width: 760px) {
-      .boosts-grid {
+      .boosts-grid,
+      .core-type-grid {
         grid-template-columns: 1fr;
+      }
+
+      .mine-cores-grid {
+        grid-template-columns: repeat(5, 1fr);
       }
     }
   </style>
@@ -199,7 +416,7 @@
 
             <label class="boost-toggle">
               <input id="boostsToggle" type="checkbox">
-              Бусты от фермы и клана
+              <span>Бусты от фермы и клана</span>
             </label>
 
             <div class="boosts-grid" id="boostsGrid">
@@ -263,7 +480,43 @@
                 <span class="val" id="statHp">500</span>
               </div>
             </div>
+
+            <div class="cores-panel">
+              <div class="cores-header" id="coresHeader">🔮 Ядра 1/10 <span style="color:#555;font-weight:400" id="coresNextUnlock"></span></div>
+              <div class="mine-cores-grid" id="coresGrid"></div>
+              <div class="core-totals-list" id="coreTotalsList"></div>
+            </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="core-modal-backdrop" id="coreModalBackdrop">
+      <div class="core-modal">
+        <div class="core-modal-header">
+          <div class="core-modal-title">Настройка ядра</div>
+          <button class="btn" id="coreModalClose">✕</button>
+        </div>
+
+        <div class="core-type-grid" id="coreTypeGrid">
+          <button class="core-type-btn" data-type="income">✴️ Ядро дохода</button>
+          <button class="core-type-btn" data-type="capacity">✳️ Ядро вместимости</button>
+          <button class="core-type-btn" data-type="hp">❤️ Ядро здоровья</button>
+          <button class="core-type-btn" data-type="regen">♻️ Ядро регенерации</button>
+        </div>
+
+        <div class="core-level-row">
+          <button type="button" class="btn core-level-btn" id="coreLevelMinus">-</button>
+          <input id="coreLevelInput" class="core-level-input" type="number" min="0" max="999" value="0" inputmode="numeric">
+          <button type="button" class="btn core-level-btn" id="coreLevelPlus">+</button>
+        </div>
+
+        <div class="core-preview" id="corePreview">✴️ lv.0 → x1</div>
+
+        <div class="core-modal-actions">
+          <button class="btn btn-primary" id="coreSaveBtn">Сохранить</button>
+          <button class="btn" id="coreRemoveBtn">Убрать</button>
+          <button class="btn" id="coreCancelBtn">Отмена</button>
         </div>
       </div>
     </div>
