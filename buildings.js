@@ -1,4 +1,4 @@
-const BUILDING_STORAGE_KEY = "overthrow_building_level_v1";
+const BUILDING_STORAGE_KEY = "overthrow_building_state_v2";
 const STATS_FILE = "building_stats.txt";
 
 const levelInput = document.getElementById("levelInput");
@@ -6,6 +6,19 @@ const levelRange = document.getElementById("levelRange");
 const levelMinus = document.getElementById("levelMinus");
 const levelPlus = document.getElementById("levelPlus");
 const buildingError = document.getElementById("buildingError");
+
+const boostsToggle = document.getElementById("boostsToggle");
+const boostsGrid = document.getElementById("boostsGrid");
+
+const farmBoost = document.getElementById("farmBoost");
+const clanIncomeBoost = document.getElementById("clanIncomeBoost");
+const clanDefenseBoost = document.getElementById("clanDefenseBoost");
+const clanMultiplier = document.getElementById("clanMultiplier");
+
+const farmBoostPreview = document.getElementById("farmBoostPreview");
+const clanIncomeBoostPreview = document.getElementById("clanIncomeBoostPreview");
+const clanDefenseBoostPreview = document.getElementById("clanDefenseBoostPreview");
+const clanMultiplierPreview = document.getElementById("clanMultiplierPreview");
 
 const buildingIcon = document.getElementById("buildingIcon");
 const buildingName = document.getElementById("buildingName");
@@ -36,7 +49,18 @@ const BUILDING_TIERS = [
 ];
 
 function formatNumber(value) {
-  return Number(value).toLocaleString("ru-RU");
+  const n = Number(value);
+  if (!Number.isFinite(n)) return "0";
+
+  if (Math.abs(n) >= 1000000) {
+    return `${(n / 1000000).toFixed(1)}М`;
+  }
+
+  if (Math.abs(n) >= 1000) {
+    return `${(n / 1000).toFixed(1)}K`;
+  }
+
+  return n.toLocaleString("ru-RU");
 }
 
 function clampLevel(value) {
@@ -48,13 +72,57 @@ function clampLevel(value) {
   return n;
 }
 
-function saveLevel(level) {
-  localStorage.setItem(BUILDING_STORAGE_KEY, String(level));
+function num(value, fallback = 0) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : fallback;
 }
 
-function loadSavedLevel() {
+function saveState() {
+  const state = {
+    level: clampLevel(levelInput.value),
+    boostsEnabled: boostsToggle.checked,
+    farmBoost: farmBoost.value,
+    clanIncomeBoost: clanIncomeBoost.value,
+    clanDefenseBoost: clanDefenseBoost.value,
+    clanMultiplier: clanMultiplier.value
+  };
+
+  localStorage.setItem(BUILDING_STORAGE_KEY, JSON.stringify(state));
+}
+
+function loadSavedState() {
   const raw = localStorage.getItem(BUILDING_STORAGE_KEY);
-  return raw ? clampLevel(raw) : 1;
+  if (!raw) {
+    return {
+      level: 1,
+      boostsEnabled: false,
+      farmBoost: "0",
+      clanIncomeBoost: "0",
+      clanDefenseBoost: "0",
+      clanMultiplier: "1"
+    };
+  }
+
+  try {
+    const state = JSON.parse(raw);
+    return {
+      level: clampLevel(state.level),
+      boostsEnabled: Boolean(state.boostsEnabled),
+      farmBoost: state.farmBoost ?? "0",
+      clanIncomeBoost: state.clanIncomeBoost ?? "0",
+      clanDefenseBoost: state.clanDefenseBoost ?? "0",
+      clanMultiplier: state.clanMultiplier ?? "1"
+    };
+  } catch {
+    return {
+      level: 1,
+      boostsEnabled: false,
+      farmBoost: "0",
+      clanIncomeBoost: "0",
+      clanDefenseBoost: "0",
+      clanMultiplier: "1"
+    };
+  }
 }
 
 function setError(message) {
@@ -63,6 +131,7 @@ function setError(message) {
     buildingError.textContent = "";
     return;
   }
+
   buildingError.style.display = "block";
   buildingError.textContent = message;
 }
@@ -95,6 +164,17 @@ function parseStatsText(text) {
   }
 }
 
+function updateBoostPreviews() {
+  farmBoostPreview.textContent = String(num(farmBoost.value, 0));
+  clanIncomeBoostPreview.textContent = String(num(clanIncomeBoost.value, 0));
+  clanDefenseBoostPreview.textContent = String(num(clanDefenseBoost.value, 0));
+  clanMultiplierPreview.textContent = String(num(clanMultiplier.value, 1));
+}
+
+function updateBoostVisibility() {
+  boostsGrid.classList.toggle("visible", boostsToggle.checked);
+}
+
 function renderLevel(level) {
   const safeLevel = clampLevel(level);
   const stats = buildingStats.get(safeLevel);
@@ -107,23 +187,41 @@ function renderLevel(level) {
   buildingIcon.textContent = tier.icon;
   buildingName.textContent = tier.name;
 
+  updateBoostPreviews();
+  updateBoostVisibility();
+
   if (!stats) {
     statIncome.textContent = "—";
     statCapacity.textContent = "—";
     statRegen.textContent = "—";
     statHp.textContent = "—";
     setError(`Для уровня ${safeLevel} нет данных в файле ${STATS_FILE}.`);
-    saveLevel(safeLevel);
+    saveState();
     return;
   }
 
-  statIncome.textContent = `${formatNumber(stats.income)}/ч`;
-  statCapacity.textContent = formatNumber(stats.capacity);
-  statRegen.textContent = `${formatNumber(stats.hp_regen)}/ч`;
-  statHp.textContent = formatNumber(stats.max_hp);
+  let income = stats.income;
+  let capacity = stats.capacity;
+  let hpRegen = stats.hp_regen;
+  let maxHp = stats.max_hp;
+
+  if (boostsToggle.checked) {
+    const farm = num(farmBoost.value, 0);
+    const incomeBoost = num(clanIncomeBoost.value, 0);
+    const defenseBoost = num(clanDefenseBoost.value, 0);
+    const multiplier = Math.max(1, num(clanMultiplier.value, 1));
+
+    income = income * (1 + farm / 100) * (1 + incomeBoost / 100) * multiplier;
+    maxHp = maxHp * (1 + defenseBoost / 100);
+  }
+
+  statIncome.textContent = `${formatNumber(income)}/ч`;
+  statCapacity.textContent = formatNumber(capacity);
+  statRegen.textContent = `${formatNumber(hpRegen)}/ч`;
+  statHp.textContent = formatNumber(maxHp);
 
   setError("");
-  saveLevel(safeLevel);
+  saveState();
 }
 
 async function loadStatsFile() {
@@ -151,18 +249,37 @@ function bindControls() {
   levelRange.addEventListener("input", () => {
     renderLevel(levelRange.value);
   });
+
+  boostsToggle.addEventListener("change", () => {
+    renderLevel(levelInput.value);
+  });
+
+  [farmBoost, clanIncomeBoost, clanDefenseBoost, clanMultiplier].forEach(input => {
+    input.addEventListener("input", () => {
+      renderLevel(levelInput.value);
+    });
+  });
 }
 
 async function initBuildings() {
   bindControls();
 
+  const saved = loadSavedState();
+  levelInput.value = String(saved.level);
+  levelRange.value = String(saved.level);
+  boostsToggle.checked = saved.boostsEnabled;
+  farmBoost.value = saved.farmBoost;
+  clanIncomeBoost.value = saved.clanIncomeBoost;
+  clanDefenseBoost.value = saved.clanDefenseBoost;
+  clanMultiplier.value = saved.clanMultiplier;
+
   try {
     await loadStatsFile();
-    renderLevel(loadSavedLevel());
+    renderLevel(saved.level);
   } catch (err) {
     console.error(err);
     setError(`Ошибка загрузки стат: ${err.message}`);
-    renderLevel(loadSavedLevel());
+    renderLevel(saved.level);
   }
 }
 
