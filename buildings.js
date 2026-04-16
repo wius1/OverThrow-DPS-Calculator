@@ -19,20 +19,20 @@ const statHp = document.getElementById("statHp");
 const buildingStats = new Map();
 
 const BUILDING_TIERS = [
-  [10, "🌾", "Поле"],
-  [20, "🪵", "Лесопилка"],
-  [30, "🌳", "Роща"],
-  [40, "🪨", "Каменоломня"],
-  [50, "🧱", "Кирпичный завод"],
-  [60, "🛖", "Лачуга"],
-  [70, "🏚️", "Развалюха"],
-  [80, "🏠", "Дом"],
-  [90, "🏡", "Усадьба"],
-  [100, "🏘️", "Квартал"],
-  [110, "🏗️", "Стройплощадка"],
-  [120, "🏭", "Завод"],
-  [130, "🏢", "Офисный центр"],
-  [140, "🏦", "Банк"]
+  { min: 1, max: 9, icon: "🌾", name: "Поле" },
+  { min: 10, max: 19, icon: "🪵", name: "Лесопилка" },
+  { min: 20, max: 29, icon: "🌳", name: "Роща" },
+  { min: 30, max: 39, icon: "🪨", name: "Каменоломня" },
+  { min: 40, max: 49, icon: "🧱", name: "Кирпичный завод" },
+  { min: 50, max: 59, icon: "🛖", name: "Лачуга" },
+  { min: 60, max: 69, icon: "🏚️", name: "Развалюха" },
+  { min: 70, max: 79, icon: "🏠", name: "Дом" },
+  { min: 80, max: 89, icon: "🏡", name: "Усадьба" },
+  { min: 90, max: 99, icon: "🏘️", name: "Квартал" },
+  { min: 100, max: 109, icon: "🏗️", name: "Стройплощадка" },
+  { min: 110, max: 119, icon: "🏭", name: "Завод" },
+  { min: 120, max: 129, icon: "🏢", name: "Офисный центр" },
+  { min: 130, max: 130, icon: "🏦", name: "Банк" }
 ];
 
 function formatNumber(value) {
@@ -68,13 +68,10 @@ function setError(message) {
 }
 
 function getTierData(level) {
-  const index = Math.floor(level / 10);
-  const safeIndex = Math.min(index, BUILDING_TIERS.length - 1);
-  const tier = BUILDING_TIERS[safeIndex];
-  return {
-    icon: tier[1],
-    name: tier[2]
-  };
+  return (
+    BUILDING_TIERS.find(t => level >= t.min && level <= t.max) ||
+    BUILDING_TIERS[BUILDING_TIERS.length - 1]
+  );
 }
 
 function parseStatsText(text) {
