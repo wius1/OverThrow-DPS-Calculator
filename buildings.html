@@ -193,7 +193,6 @@
       font-size: 12px;
       font-weight: 600;
       color: #aaa;
-      margin-bottom: 8px;
     }
 
     .mine-cores-grid {
@@ -252,13 +251,6 @@
       color: #fff;
       font-weight: 700;
       margin-top: 2px;
-    }
-
-    .cores-total-boost {
-      margin-top: 10px;
-      color: #fff;
-      font-weight: 700;
-      font-size: 13px;
     }
 
     .core-totals-list {
@@ -482,7 +474,11 @@
             </div>
 
             <div class="cores-panel">
-              <div class="cores-header" id="coresHeader">🔮 Ядра 1/10 <span style="color:#555;font-weight:400" id="coresNextUnlock"></span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;">
+                <button class="btn" id="clearCoresBtn" type="button">Очистить</button>
+                <div class="cores-header" id="coresHeader" style="margin-bottom:0;">🔮 Ядра 1/10 <span style="color:#555;font-weight:400" id="coresNextUnlock"></span></div>
+              </div>
+
               <div class="mine-cores-grid" id="coresGrid"></div>
               <div class="core-totals-list" id="coreTotalsList"></div>
             </div>
