@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  >
+  <title>Калькулятор построек</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .building-wrap {
+      display: grid;
+      gap: 14px;
+    }
+
+    .building-level-control {
+      display: grid;
+      grid-template-columns: 44px 1fr 44px;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .building-level-btn {
+      min-height: 44px;
+      padding: 0;
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .building-level-input {
+      text-align: center;
+      font-weight: 700;
+      -moz-appearance: textfield;
+    }
+
+    .building-level-input::-webkit-outer-spin-button,
+    .building-level-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .building-range {
+      width: 100%;
+    }
+
+    .building-card {
+      background: #252538;
+      border-radius: 12px;
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .building-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .building-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .building-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      flex: 0 0 auto;
+    }
+
+    .building-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .building-sub {
+      font-size: 12px;
+      color: #aaa;
+      margin-top: 2px;
+    }
+
+    .building-stats {
+      display: grid;
+      gap: 8px;
+    }
+
+    .hq-stat-card {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      background: #1f2333;
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+
+    .hq-stat-card span:first-child {
+      color: #bbb;
+      font-size: 13px;
+    }
+
+    .hq-stat-card .val {
+      color: #fff;
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .building-error {
+      display: none;
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(244, 67, 54, 0.12);
+      color: #ffb4b4;
+      border: 1px solid rgba(244, 67, 54, 0.22);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="topbar">
+      <a class="btn" href="index.html">← На главную</a>
+    </div>
+
+    <div class="app-shell">
+      <div class="app-header">
+        <h3>🏭 Калькулятор построек</h3>
+      </div>
+
+      <div class="app-body">
+        <div class="building-wrap">
+          <div class="settings-card">
+            <div class="settings-section-title">Уровень постройки</div>
+
+            <div class="building-level-control">
+              <button type="button" class="btn building-level-btn" id="levelMinus">-</button>
+              <input id="levelInput" class="building-level-input" type="number" min="1" max="130" value="1" inputmode="numeric">
+              <button type="button" class="btn building-level-btn" id="levelPlus">+</button>
+            </div>
+
+            <input id="levelRange" class="building-range" type="range" min="1" max="130" value="1">
+
+            <div class="building-error" id="buildingError"></div>
+          </div>
+
+          <div class="building-card">
+            <div class="building-header">
+              <div class="building-title">
+                <div class="building-icon" id="buildingIcon">🌾</div>
+                <div>
+                  <div class="building-name" id="buildingName">Поле</div>
+                  <div class="building-sub">Ур. <span id="buildingLevelTitle">1</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="building-stats">
+              <div class="hq-stat-card">
+                <span>Доход</span>
+                <span class="val" id="statIncome">50/ч</span>
+              </div>
+
+              <div class="hq-stat-card">
+                <span>Ёмкость</span>
+                <span class="val" id="statCapacity">8400</span>
+              </div>
+
+              <div class="hq-stat-card">
+                <span>♻️ Реген</span>
+                <span class="val" id="statRegen">125/ч</span>
+              </div>
+
+              <div class="hq-stat-card">
+                <span>❤️ Макс HP</span>
+                <span class="val" id="statHp">500</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="buildings.js"></script>
+  </div>
+</body>
+</html>
